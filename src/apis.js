@@ -26,11 +26,21 @@ const saveReport = async (reportId, metaInfo) => {
   } catch (error) {
     console.log(error)
   }
+}
 
+//     const { startTime ， endTime projectName, biddingID, biddingCompany, biddingAgent, participateCompany, time } = req.query;
+const getReports = async (queryOptions) => { 
+  try {
+    const response = await axios.get(`${BASE_URL}/duplicate/reports`, { params: queryOptions });
+    return response.data;
+  } catch (error) {
+    console.log(error)
+  }
 }
 
 export {
   getReportDetail,
   getDuplicates,
-  saveReport
+  saveReport,
+  getReports
 }

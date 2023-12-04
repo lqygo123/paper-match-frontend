@@ -142,6 +142,7 @@ export default {
         results: this.compireResults.map(result => result._id),
       });
       console.log('handleGenerateReport', res.data.data)
+      this.$router.push({ path: '/report-detail', query: { id: res.data.data._id, mode: 'edit' } })
     },
 
     async execCompire(biddingFileId, targetFileId) {

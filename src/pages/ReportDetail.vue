@@ -3,11 +3,11 @@
     <Button @click="handleEdit">编辑</Button>
     <Button @click="handleSave">保存</Button>
     <div v-if="mode === 'detail'" class="report-header">
-      <div class="header-item">项目名称：{{ metaInfo.projectName }}</div>
-      <div class="header-item">招标编号：{{ metaInfo.biddingNumber }}</div>
-      <div class="header-item">招标人：{{ metaInfo.biddingCompany }}</div>
-      <div class="header-item">参与公司：{{ metaInfo.participatingCompany }}</div>
-      <div class="header-item">时间：{{ metaInfo.time }}</div>
+      <div class="header-item">项目名称：{{ metaInfo?.projectName }}</div>
+      <div class="header-item">招标编号：{{ metaInfo?.biddingNumber }}</div>
+      <div class="header-item">招标人：{{ metaInfo?.biddingCompany }}</div>
+      <div class="header-item">参与公司：{{ metaInfo?.participatingCompany }}</div>
+      <div class="header-item">时间：{{ metaInfo?.time }}</div>
       <div class="header-item">提交时间：{{ reportTime }}</div>
     </div>
     <div v-if="mode === 'edit'" class="report-header">
@@ -66,7 +66,13 @@ export default {
       console.log('getReportDetail', res);
       const results = await getDuplicates(res.data.results)
       this.reportTime = res.data.reportTime;
-      this.metaInfo = res.data.metaInfo;
+      this.metaInfo = res.data.metaInfo || {
+        projectName: '',
+        biddingNumber: '',
+        biddingCompany: '',
+        participatingCompany: '',
+        time: '',
+      };
       console.log('getDuplicates', results)
       this.results = results.data;
     },
