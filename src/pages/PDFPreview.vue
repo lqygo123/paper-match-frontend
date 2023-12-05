@@ -23,7 +23,7 @@
         v-for="(item, index) in MockMatchRes"
         :key="index"
         class="res-item"
-        :class="{ active: item.id === activeResId }"
+        :class="{ active: item.id === highlightedBlock.id }"
         @click="handleResItemClick(item)"
         :data-id="item.id"
       >
@@ -33,7 +33,7 @@
           <div class="icon"></div>
         </div>
 
-        <div class="res-item_card" v-if="item.id === activeResId">
+        <div class="res-item_card" v-if="item.id === highlightedBlock.id">
           <div>重复内容：</div>
           <div>
             {{ item.text }}
@@ -51,7 +51,7 @@ export default {
   data() {
     return {
       leftWidth: document.documentElement.clientWidth * 0.3,
-      activeResId: null,
+      highlightedBlock: {},
       rendedPages: {},
       MockMatchRes: data.textRepetitions,
       pdf1TextTotal: data.pdf1TextTotal,
@@ -154,17 +154,17 @@ export default {
       const blocks = this.MockMatchRes.filter(
         (item) => item.pdf1Page === pageNum
       );
-      return blocks;
+      // return blocks;
 
       // 对于 blocks 中 pdf1CoordStr 相同的，进行去重
-      // const pdf1coordMap = {};
-      // blocks.forEach((block) => {
-      //   const key = block.pdf1CoordStr;
-      //   if (!pdf1coordMap[key]) {
-      //     pdf1coordMap[key] = block;
-      //   }
-      // });
-      // return Object.values(pdf1coordMap);
+      const pdf1coordMap = {};
+      blocks.forEach((block) => {
+        const key = `${block.pdf1Page}-${block.pdf1BlockIdx}`
+        if (!pdf1coordMap[key]) {
+          pdf1coordMap[key] = block;
+        }
+      });
+      return Object.values(pdf1coordMap);
     },
 
     // 在 canvas.parentNode 中，以 absolute 定位渲染高亮块
@@ -187,7 +187,7 @@ export default {
         div.style.backgroundColor = "rgba(255, 0, 0, 0.2)";
         div.dataset.id = block.id;
         div.dataset.index = block.index;
-        div.dataset.pdf1CoordStr = block.pdf1CoordStr;
+        div.dataset.blockIdx = `${block.pdf1Page}-${block.pdf1BlockIdx}`;
         div.innerText = block.text;
 
         // 为 div 添加点击事件，点击时高亮，并 log 当前的 block 信息
@@ -241,17 +241,18 @@ export default {
     handleResItemClick(item) {
       console.log("handleResItemClick", item);
       const execHighlightBlock = () => {
-        if (this.activeResId) {
+        if (this.highlightedBlock) {
           const oldHighlightBlock = window.document.querySelector(
-            `.highlight-block[data-id="${this.activeResId}"]`
+            `.highlight-block[data-block-idx="${this.highlightedBlock.pdf1Page}-${this.highlightedBlock.pdf1BlockIdx}"]`
           );
-          oldHighlightBlock.style.backgroundColor = "rgba(255, 0, 0, 0.2)";
+          if (oldHighlightBlock) oldHighlightBlock.style.backgroundColor = "rgba(255, 0, 0, 0.2)";
+
         }
-        this.activeResId = item.id;
+        this.highlightedBlock = item;
         const highlightBlock = window.document.querySelector(
-          `.highlight-block[data-id="${item.id}"]`
+          `.highlight-block[data-block-idx="${this.highlightedBlock.pdf1Page}-${this.highlightedBlock.pdf1BlockIdx}"]`
         );
-        highlightBlock.style.backgroundColor = "rgba(255, 255, 0, 0.5)";
+        if (highlightBlock) highlightBlock.style.backgroundColor = "rgba(255, 255, 0, 0.5)";
       };
 
       const pageNum = item.pdf1Page;
