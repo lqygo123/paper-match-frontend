@@ -1,13 +1,23 @@
 
 <template>
   <div id="sidebar">
-    智能评价辅助平台
-    <div class="navi-item">
-      <router-link to="/file-upload">标书查重</router-link>
-    </div>
-    <div class="navi-item">
-      <router-link to="/report-list">查看报告</router-link>
-    </div>
+    <el-menu
+      :default-active="activeIndex"
+      class="el-menu-vertical-demo"
+      @select="handleSelect"
+    >
+      <el-menu-item index="/file-upload">
+        <template slot="title">
+          <i class="el-icon-folder"></i>
+          <span>标书查重 </span>
+        </template>
+      </el-menu-item>
+      <el-menu-item index="/report-list">
+        <i class="el-icon-tickets"></i>
+        <span>查看报告</span>
+        <!-- <router-link to="/report-list"></router-link> -->
+      </el-menu-item>
+    </el-menu>
   </div>
 </template>
 
@@ -16,29 +26,44 @@
 
 export default {
   // eslint-disable-next-line vue/multi-word-component-names
-  name: 'Sidebar',
+  name: "Sidebar",
   components: {
     // HelloWorld,
   },
   data() {
     return {
-      aaa: 123
+      activeIndex: "/file-upload",
     };
   },
-  mounted() {
-
-  },
+  mounted() {},
   methods: {
-
-  }
+    handleSelect(key) {
+      this.activeIndex = key;
+      this.$router.push(
+        key,
+        () => {},
+        () => {}
+      );
+    },
+  },
 };
 </script>
 
-<style>
+<style scoped>
 #sidebar {
-  background: #e6e6e6;
+  background: #fff;
   height: 100%;
   width: 200px;
   flex: 0 0 200px;
+  padding: 0 10px;
+}
+::v-deep .el-menu {
+  border-right: 0;
+}
+::v-deep .el-menu-item {
+  border-bottom: 1px solid #dcdfe6;
+}
+::v-deep .el-menu-item.is-active {
+  color: #007bff;
 }
 </style>

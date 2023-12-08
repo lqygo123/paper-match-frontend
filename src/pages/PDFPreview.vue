@@ -1,18 +1,11 @@
+<!-- eslint-disable no-unused-vars -->
 <template>
   <div class="flex">
     <!-- <div class="wrap"> -->
-    <div class="pdfContainer" id="pdfContainer" ref="pdfContainer"></div>
-    <div
-      class="download"
-      id="download"
-      :style="'right:' + (leftWidth + 20) + 'px'"
-    >
-      下载
-    </div>
-    <!-- </div> -->
+    <div class="pdfContainer" :class="mode" id="pdfContainer" ref="pdfContainer"></div>
 
     <div class="res-list" id="right" :style="'width:' + leftWidth + 'px'">
-      <div class="line" v-drag></div>
+      <!-- <div class="line" v-drag></div> -->
       <div class="header">
         <div class="title">重复率</div>
         <div class="content">
@@ -29,7 +22,7 @@
       >
         <div class="res-item_title">
           <div class="index">{{ item.index }}</div>
-          <div class="content">{{ item.text }}</div>
+          <div class="content"> {{ decodeURIComponent(compireResult.targetFileName) }} 第{{ item.pdf2Page }}页 </div>
           <div class="icon"></div>
         </div>
 
@@ -46,71 +39,75 @@
 
 <script>
 import * as pdfjsLib from "pdfjs-dist/build/pdf.min.mjs";
-const data = require("../../jsons/output_digital.json");
+import { DOMAIN } from '../../config'
+import { getDuplicateDetail } from '../apis'
+
+// const data = require("../../jsons/output_digital.json");
+const data = require("../../jsons/output_scan_transfromed.json");
+
+const parseCord = (cord, height, factor) => {
+  // eslint-disable-next-line no-unused-vars
+  const [cord1, cord2, cord3, cord4] = cord
+  if (cord1.length) {
+    return [cord1[0]* factor, cord1[1]* factor, cord3[0]* factor, cord3[1]* factor]
+  } else {
+    return [cord1 * factor,  (  cord2) * factor, cord3 * factor, (  cord4) * factor]
+  }
+};
+
 export default {
   data() {
     return {
+      mode: this.$route.query.mode,
+      compireId: this.$route.query.compireId,
+      factor: 1,
       leftWidth: document.documentElement.clientWidth * 0.3,
       highlightedBlock: {},
       rendedPages: {},
-      MockMatchRes: data.textRepetitions,
+      MockMatchRes: data.textRepetitions || data.ocrRepetitions,
+      ocrPages: data.pdf1Pages || [],
       pdf1TextTotal: data.pdf1TextTotal,
       textRepetitionCount: data.textRepetitionCount,
+      compireResult: {},
     };
   },
-  //注册局部自定义指令
-  directives: {
-    //el：指令所绑定的元素
-    drag(el) {
-      //鼠标按下事件
-
-      el.onmousedown = function (e) {
-        let timer = null;
-
-        // 获取鼠标在元素上的位置
-        let disX = e.clientX - el.offsetLeft;
-        const container = document.getElementById("right");
-        const containerWidth = parseFloat(container.style.width);
-        // const pdfContainerWidth =
-        //   document.getElementById("pdfContainer").clientWidth;
-        const maxWidth = window.innerWidth - 842;
-        const download = document.getElementById("download");
-        //鼠标移动事件
-        document.onmousemove = function (e) {
-          if (timer) {
-            return false;
-          }
-          timer = setTimeout(function () {
-            const distance = e.clientX - disX;
-            const width = containerWidth - distance;
-            if (width >= maxWidth) {
-              container.style.width = maxWidth + "px"; //设置定位元素的左部位置
-              download.style.right = maxWidth + 20 + "px";
-            } else {
-              container.style.width = containerWidth - distance + "px"; //设置定位元素的左部位置
-              download.style.right = containerWidth - distance + 20 + "px";
-            }
-            timer = null;
-          }, 100);
-        };
-        //鼠标松开事件
-        document.onmouseup = function () {
-          document.onmousemove = document.onmouseup = null;
-        };
-      };
-    },
-  },
-  mounted() {
-    this.loadPdf("http://localhost:3000/pdf1.pdf");
+  async mounted() {
     console.log("this.$route", this.$route); // 输出 query 参数
-    // 根据这个参数，加载不同的 pdf，请求接口获取信息
-    // this.loadPdf("http://127.0.0.1:50721/1.pdf");
+
+    const res = await getDuplicateDetail(this.compireId)
+    const compireResult = res
+
+    this.mode = compireResult.data.mode
+
+    if (this.mode === 'ocr') {
+      this.factor = 0.4
+    } else {
+      this.factor = 1
+    }
+    
+    console.log('compireResult', compireResult.data)
+    console.log('compireResult detail', compireResult.detail)
+
+    this.compireResult = compireResult.data
+
+    this.ocrPages = compireResult.detail.pdf1Pages || []
+    this.MockMatchRes = compireResult.detail.textRepetitions || compireResult.detail.ocrRepetitions || []
+
+    this.loadPdf(`${DOMAIN}/api/v1/file/${this.compireResult.biddingFileId}`);
   },
   methods: {
     async loadPdf(url) {
-      pdfjsLib.GlobalWorkerOptions.workerSrc = require("pdfjs-dist/build/pdf.worker.min.mjs");
-      this.pdfDocument = await pdfjsLib.getDocument(url).promise;
-      const numPages = this.pdfDocument.numPages;
+
+      let numPages
+
+      if (this.mode === 'ocr') {
+        numPages = this.ocrPages.length;
+      } else {
+        pdfjsLib.GlobalWorkerOptions.workerSrc = require("pdfjs-dist/build/pdf.worker.min.mjs");
+        this.pdfDocument = await pdfjsLib.getDocument(url).promise;
+        numPages = this.pdfDocument.numPages;
+      }
+
       for (let pageNum = 1; pageNum <= numPages; pageNum++) {
         const canvasContainer = document.createElement("div");
         canvasContainer.className = "pdf-page";
@@ -119,7 +116,7 @@ export default {
         canvas.dataset.pageNum = pageNum;
         this.$refs.pdfContainer.appendChild(canvasContainer);
         canvasContainer.appendChild(canvas);
-        this.setCanvasSize(pageNum, canvas);
+        // this.setCanvasSize(pageNum, canvas);
       }
 
       const observer = new IntersectionObserver(
@@ -144,10 +141,20 @@ export default {
     },
 
     async setCanvasSize(pageNum, canvas) {
-      const page = await this.pdfDocument.getPage(pageNum);
-      const viewport = page.getViewport({ scale: 1 });
-      canvas.height = viewport.height;
-      canvas.width = viewport.width;
+      if (this.mode === 'ocr') {
+        const page = this.ocrPages[pageNum - 1];
+        const viewport = {
+          width: page.width ,
+          height: page.height ,
+        };
+        canvas.height = viewport.height * this.factor;
+        canvas.width = viewport.width * this.factor;
+      } else {
+        const page = await this.pdfDocument.getPage(pageNum);
+        const viewport = page.getViewport({ scale: 1 });
+        canvas.height = viewport.height  * this.factor;
+        canvas.width = viewport.width * this.factor;
+      }
     },
 
     getHighlightBlocks(pageNum) {
@@ -169,26 +176,36 @@ export default {
 
     // 在 canvas.parentNode 中，以 absolute 定位渲染高亮块
     renderHighlightBlocks(pageNum, canvas) {
+      if (canvas.isRenderHighlitBlocks) return;
+      canvas.isRenderHighlitBlocks = true
       const blocks = this.getHighlightBlocks(pageNum - 1);
       const container = canvas.parentNode;
+      console.log("renderHighlightBlocks blocks", pageNum, blocks, container)
 
       blocks.forEach((block) => {
         const { pdf1coord } = block;
-        const [x1, y1, x2, y2] = pdf1coord;
+        let [x1, y1, x2, y2] = parseCord(pdf1coord, container.clientHeight, this.factor);
         const width = x2 - x1;
         const height = y2 - y1;
         const div = document.createElement("div");
         div.className = "highlight-block";
         div.style.position = "absolute";
         div.style.left = `${x1}px`;
-        div.style.top = `${container.clientHeight - y2}px`;
+
+        console.log(y2)
+        if (this.mode === 'ocr') {
+          div.style.top = `${y1}px`;
+        } else {
+          div.style.bottom = `${y1}px`;
+        }
         div.style.width = `${width}px`;
         div.style.height = `${height}px`;
         div.style.backgroundColor = "rgba(255, 0, 0, 0.2)";
         div.dataset.id = block.id;
         div.dataset.index = block.index;
         div.dataset.blockIdx = `${block.pdf1Page}-${block.pdf1BlockIdx}`;
-        div.innerText = block.text;
+        // div.innerText = block.text;
+        
 
         // 为 div 添加点击事件，点击时高亮，并 log 当前的 block 信息
         div.addEventListener("click", async () => {
@@ -208,16 +225,34 @@ export default {
     },
 
     async renderPage(pageNum, canvas) {
-      console.log("renderPage", pageNum, canvas);
       if (canvas.isRendered || !canvas) return;
       canvas.isRendered = true;
-      const page = await this.pdfDocument.getPage(pageNum);
-      const viewport = page.getViewport({ scale: 1 });
-      const context = canvas.getContext("2d");
-      canvas.height = viewport.height;
-      canvas.width = viewport.width;
-      await page.render({ canvasContext: context, viewport }).promise;
-      canvas.isRendered = true;
+      if (this.mode === 'ocr') {
+        const page = this.ocrPages[pageNum - 1];
+
+        const viewport = {
+          width: page.width * this.factor,
+          height: page.height * this.factor,
+        };
+        const context = canvas.getContext("2d");
+        canvas.height = viewport.height ;
+        canvas.width = viewport.width ;
+        // drawImage from base64Data in page.data
+        const img = new Image();
+        // 组装 dataurl
+        // img.src = `http://localhost:3000/output_scan_pdf1/pdf1-${pageNum - 1}.png`;
+        img.src = `${DOMAIN}${page.src}`;
+        img.onload = function () {
+          context.drawImage(img, 0, 0, viewport.width, viewport.height);
+        };
+      } else {
+        const page = await this.pdfDocument.getPage(pageNum);
+        const viewport = page.getViewport({ scale: 1 });
+        const context = canvas.getContext("2d");
+        canvas.height = viewport.height;
+        canvas.width = viewport.width;
+        await page.render({ canvasContext: context, viewport }).promise;
+      }
     },
 
     scrollToTargetPage(index) {
@@ -506,5 +541,12 @@ export default {
   padding: 8px 15px;
   font-size: 16px;
   border-radius: 4px;
+}
+
+.download.switch {
+  background-color: #eaf0ff;
+  color: #007bff;
+  border: 1px solid #007bff;
+  bottom: 70px;
 }
 </style>
