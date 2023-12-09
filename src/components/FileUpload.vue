@@ -1,43 +1,34 @@
 <template>
   <div id="file-upload">
-    <div id="mode-switch" class="tab">
-      <div @click="mode = 'digital'" :class="{ active: mode === 'digital' }">
+    <div
+      id="mode-switch"
+      class="file-upload-tab"
+    >
+      <div
+        class="file-upload-tab-item"
+        @click="mode = 'digital'"
+        :class="{ active: mode === 'digital' }"
+      >
         <span>文件对比</span>
-        <div class="tab_line"></div>
       </div>
-      <div @click="mode = 'ocr'" :class="{ active: mode === 'ocr' }">
+      <div
+        class="file-upload-tab-item"
+        @click="mode = 'ocr'"
+        :class="{ active: mode === 'ocr' }"
+      >
         <span>扫描件对比</span>
-        <div class="tab_line"></div>
       </div>
     </div>
 
-    <div class="drop_wrap">
-      <div
-        id="drop-zone"
-        class="drap"
-        @drop="handleDrop"
-        @dragover.prevent
-        @dragenter.prevent
-      >
-        <div class="upload-box left-box">
-          <div class="origin-file preview-div">
-            <img
-              src="../assets/icon.webp"
-              style="top: 0px; margin-top: 0px; width: 72px; height: 72px"
-            />
-          </div>
-        </div>
-        <div class="unUploaded-container">
-          <div class="select-file-text left-select">投标书文件到这里（用于比对查重）</div>
-          <div class="file-restriction">
-            格式支持：单份50M以内word、pdf、ppt、txt、扫描件文档进行比对
-            页数文档：电子文档500页，扫描件300页
-          </div>
-        </div>
+    <div class="main-content">
+      <div class="file-upload-header">
+        招标文件（可选）
+      </div>
+      <div class="file-upload-desc">
+        可选择上传一份招标文件参与查重，与招标文件相同内容不参与查重
       </div>
       <div
-        id="drop-zone"
-        class="drap"
+        class="drop-zone"
         @drop="handleDropSkipFile"
         @dragover.prevent
         @dragenter.prevent
@@ -51,43 +42,89 @@
           </div>
         </div>
         <div class="unUploaded-container">
-          <div class="select-file-text left-select">招标文件放这里（用于排除部分结果）</div>
+          <div class="select-file-text left-select">拖放招标文件到这里</div>
           <div class="file-restriction">
             格式支持：单份50M以内word、pdf、ppt、txt、扫描件文档进行比对
             页数文档：电子文档500页，扫描件300页
           </div>
         </div>
       </div>
-    </div>
-    <input
-      type="file"
-      @change="handleFile"
-      ref="fileInput"
-      style="display: none"
-    />
-    <!-- <button @click="triggerFileInput">选择文件</button> -->
-    <div v-if="files.length || skipFile" class="file-list">
-      <div class="file-item" v-for="(file, index) in files" :key="index">
-        <div class="file-content"> 投标文件 </div>
-        <div class="file-name">{{ file.name }}</div> 
-        <div class="file-content">{{ file.state }}</div>
-        <div class="file-content"> <el-button @click="deleteFile(index)">删除</el-button></div>
+
+
+      <div
+        v-if="skipFile"
+        class="file-list"
+      >
+        <div
+          class="file-item"
+        >
+          <div class="file-content"> 招标文件 </div>
+          <div class="file-name">{{ skipFile.name }}</div>
+          <div class="file-content">{{ skipFile.state }}</div>
+          <div class="file-content"> <el-button @click="deleteSkipFile()">删除</el-button></div>
+        </div>
       </div>
 
-      <div class="file-item" v-if="skipFile">
-        <div class="file-content"> 招标文件 </div>
-        <div class="file-name">{{ skipFile.name }}</div> 
-        <div class="file-content">{{ skipFile.state }}</div>
-        <div class="file-content"> <el-button @click="deleteSkipFile()">删除</el-button></div>
+
+
+      <div class="file-upload-header">
+        投标文件（必选）
       </div>
-      
+
+      <div
+        class="drop-zone"
+        @drop="handleDrop"
+        @dragover.prevent
+        @dragenter.prevent
+      >
+        <div class="upload-box left-box">
+          <div class="origin-file preview-div">
+            <img
+              src="../assets/icon.webp"
+              style="top: 0px; margin-top: 0px; width: 72px; height: 72px"
+            />
+          </div>
+        </div>
+        <div class="unUploaded-container">
+          <div class="select-file-text left-select">拖放投标文件到这里</div>
+          <div class="file-restriction">
+            格式支持：单份50M以内word、pdf、ppt、txt、扫描件文档进行比对
+            页数文档：电子文档500页，扫描件300页
+          </div>
+        </div>
+      </div>
+
+
+      <div
+        v-if="files.length"
+        class="file-list"
+      >
+        <div
+          class="file-item"
+          v-for="(file, index) in files"
+          :key="index"
+        >
+          <div class="file-content"> 投标文件 </div>
+          <div class="file-name">{{ file.name }}</div>
+          <div class="file-content">{{ file.state }}</div>
+          <div class="file-content"> <el-button @click="deleteFile(index)">删除</el-button></div>
+        </div>
+      </div>
+
+      <input
+        type="file"
+        @change="handleFile"
+        ref="fileInput"
+        style="display: none"
+      />
+      <!-- <button @click="triggerFileInput">选择文件</button> -->
     </div>
-    <div class="progress">
-      <el-progress :percentage="progress" color="#007bff"></el-progress>
-    </div>
-    <div class="buttons">
-      <button class="compare" @click="handleCompire">执行对比</button>
-      <!-- <button class="repert" @click="handleGenerateReport">生成报告</button> -->
+
+    <div class="buttons-wrap">
+      <el-button
+        type="primary"
+        @click="handleCompire"
+      >执行对比</el-button>
     </div>
 
     <!-- <div class="compire-results">
@@ -106,8 +143,6 @@
 </template>
 
 <script>
-// import axios from "axios";
-// import { API_BASE_URL } from "../../config";
 import { uploadFile, createReport, execDuplicate } from "../apis";
 
 export default {
@@ -118,7 +153,6 @@ export default {
       files: [],
       skipFile: null,
       compireResults: [],
-      progress: 20,
     };
   },
   watch: {
@@ -202,12 +236,6 @@ export default {
       file.state = "上传中";
       this.files = [...this.files];
       try {
-        // const res = await axios.post(`${API_BASE_URL}/file/upload`, formData);
-        // if (res.status !== 200) {
-        //   throw new Error("上传失败");
-        // }
-        // const fileId = res.data.data._id;
-
         const res = await uploadFile(formData, (percent) => {
           console.log(file.name, percent)
         });
@@ -225,14 +253,6 @@ export default {
       formData.append("file", this.skipFile, encodeURIComponent(this.skipFile.name));
       this.skipFile.state = "上传中";
       try {
-        // const res = await axios.post(`${API_BASE_URL}/file/upload`, formData);
-        // if (res.status !== 200) {
-        //   throw new Error("上传失败");
-        // }
-        // const fileId = res.data.data._id;
-        // this.skipFile.state = "上传成功";
-        // this.skipFile.fileId = fileId;
-
         const res = await uploadFile(formData, (percent) => {
           console.log(this.skipFile.name, percent)
         });
@@ -245,9 +265,8 @@ export default {
           state: "上传成功",
           fileId: res.data._id,
         };
-        
+
       } catch (error) {
-        // this.skipFile.state = "上传失败";
         this.skipFile = {
           ...this.skipFile,
           name: this.skipFile.name,
@@ -312,7 +331,7 @@ export default {
 
     async execCompire(biddingFileId, targetFileId, skipFileId) {
 
-      const requestOptions =  {
+      const requestOptions = {
         biddingFileId,
         targetFileId,
         mode: this.mode,
@@ -333,40 +352,101 @@ export default {
 </script>
 
 <style scoped>
-#drop-zone {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  width: 100%;
-  height: 300px;
-  min-height: 264px;
-  background: rgba(11, 104, 218, 0.04);
-  border-radius: 4px;
-  cursor: pointer;
-  border: 1px dashed #0b68da;
-  /* background-color: #ccc; */
-}
 #file-upload {
   background: #fff;
   border-radius: 8px;
-  padding: 24px;
+  /* padding: 0 24px; */
+  /* box-sizing: content-box; */
+  margin: 24px;
+  height: calc(100vh - 100px);
+  color: #666666;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-direction: column;
+  position: relative;
+  /* width: 100%; */
+  box-sizing: border-box;
 }
 
-.file-list {
-  border: 1px dashed #0b68da;
-  margin-top: 30px;
-  padding: 20px;
+.file-upload-tab {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  height: 45px;
+  padding: 0;
+
+  border-bottom: 1px solid #e6e6e6;
+  width: 100%;
+}
+
+.file-upload-tab-item {
+  width: 120px;
+  height: 45px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   border-radius: 4px;
+  cursor: pointer;
+  margin-right: 20px;
+}
+
+/* active */
+.file-upload-tab-item.active {
+  color: #007bff;
+  position: relative;
+}
+
+.file-upload-tab-item.active::after {
+  position: absolute;
+  content: "";
+  display: block;
+  width: 100%;
+  height: 2px;
+  background: #007bff;
+  margin-top: 5px;
+  bottom: 0;
+}
+
+#file-upload .main-content {
+  padding: 24px 24px;
+  margin: 0 24px;
+  flex-grow: 1;
+  overflow-y: auto;
+  box-sizing: content-box;
+  width: calc(100% - 48px);
+}
+
+.file-upload-header {
+  font-size: 16px;
+  font-weight: 400;
+  color: #333333;
+  line-height: 22px;
+  margin-bottom: 10px;
+  font-weight: bolder;
+}
+
+.file-upload-desc {
+  margin-bottom: 20px;
+}
+
+
+.file-list {
+  margin-bottom: 24px;
 }
 
 .file-list .file-item {
   display: flex;
   align-items: center;
   justify-content: space-around;
+  margin-bottom: 8px;
 }
+
 .file-list .file-item .file-name {
   flex-grow: 1;
 }
+
 .file-list .file-item .file-content {
   margin: 0 10px;
   width: 80px;
@@ -381,34 +461,36 @@ export default {
   align-items: center;
   justify-content: space-between;
 }
-.tab {
-  margin-bottom: 16px;
-}
-.tab > div {
-  display: inline-block;
-  font-size: 14px;
-  font-weight: 500;
-  color: #303133;
-  line-height: 22px;
-  height: 28px;
-  margin-right: 16px;
-  cursor: pointer;
-}
-.tab > div .tab_line {
+
+.drop-zone {
+  display: flex;
+  /* flex-direction: column; */
+  justify-content: space-between;
+  align-items: center;
   width: 100%;
-  height: 2px;
-  margin-top: 6px;
+  height: 110px;
+  background: rgba(11, 104, 218, 0.04);
+  border-radius: 4px;
+  cursor: pointer;
+  border: 1px dashed #0b68da;
+  margin-bottom: 20px;
+  /* background-color: #ccc; */
 }
-.tab > div.active .tab_line {
-  background: #007bff;
-}
-.tab > div.active span {
-  color: #007bff;
-}
+
 .upload-box {
-  margin: 0 auto;
+  /* margin: 0 auto; */
   border-radius: 2px;
+  width: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
+
+.unUploaded-container {
+  flex-grow: 1;
+  padding-right: 24px;
+}
+
 .origin-file {
   width: inherit;
   height: inherit;
@@ -418,37 +500,53 @@ export default {
   justify-content: center;
   vertical-align: middle;
 }
-.unUploaded-container {
-  text-align: center;
-}
 .select-file-text {
-  margin-top: 20px;
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
     Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
   font-size: 16px;
   color: #0f87ff;
-  text-align: center;
   line-height: 24px;
   font-weight: 400;
 }
+
 .file-restriction {
   margin-top: 8px;
-  padding: 0 24px;
+  /* padding: 0 24px; */
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
     Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
   font-size: 13px;
   color: #909499;
   letter-spacing: 0;
-  text-align: center;
+
   line-height: 20px;
   font-weight: 400;
 }
-.buttons {
-  text-align: center;
+
+.buttons-wrap {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 60px;
+  border-top: 1px solid #e6e6e6;
 }
+.buttons-wrap .el-button {
+  width: 100px;
+  height: 34px;
+  border-radius: 4px;
+  font-size: 16px;
+  line-height: 1;
+  color: #fff;
+  text-align: center;
+  font-weight: 400;
+  cursor: pointer;
+  padding: 0;
+}
+
 .compare {
   margin-right: 20px;
 }
+
 .compare,
 .repert {
   border: none;
@@ -463,24 +561,5 @@ export default {
   line-height: 21px;
   font-weight: 400;
   cursor: pointer;
-}
-.progress {
-  opacity: 0;
-  text-align: center;
-  margin: 10px 0;
-}
-::v-deep .el-progress {
-  display: inline-block;
-  width: 300px;
-}
-.drop_wrap {
-  display: flex;
-  justify-content: space-between;
-}
-.drop_wrap > div {
-  display: inline-block;
-}
-.drop_wrap > div:first-child {
-  margin-right: 24px;
 }
 </style>

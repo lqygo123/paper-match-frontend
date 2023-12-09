@@ -17,10 +17,11 @@
         <span>查看报告</span>
         <!-- <router-link to="/report-list"></router-link> -->
       </el-menu-item>
-      <div class="logout" @click="logout">
+      <el-menu-item index="logout">
         <i class="el-icon-switch-button"></i>
         <span>退出登录</span>
-      </div>
+        <!-- <router-link to="/report-list"></router-link> -->
+      </el-menu-item>
     </el-menu>
   </div>
 </template>
@@ -45,11 +46,21 @@ export default {
   },
   methods: {
     handleSelect(key) {
+
+
+
       this.activeIndex = key;
+
+      if (key === 'logout') {
+        this.logout()
+        this.$router.push(
+          "/login"
+        );
+        return
+      }
+
       this.$router.push(
-        key,
-        () => {},
-        () => {}
+        key
       );
     },
 

@@ -40,6 +40,11 @@ export default {
 </script>
 
 <style>
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
 #app {
   height: 100%;
   width: 100%;
