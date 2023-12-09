@@ -7,6 +7,7 @@
     <div class="res-list" id="right" :style="'width:' + leftWidth + 'px'">
       <!-- <div class="line" v-drag></div> -->
       <div class="header">
+        <button @click="handleExportPdf">导出</button>
         <div class="title">重复率</div>
         <div class="content">
           {{ textRepetitionCount }} / {{ pdf1TextTotal }}
@@ -39,6 +40,8 @@
 
 <script>
 import * as pdfjsLib from "pdfjs-dist/build/pdf.min.mjs";
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 import { DOMAIN } from '../../config'
 import { getDuplicateDetail } from '../apis'
 
@@ -297,6 +300,67 @@ export default {
         execHighlightBlock();
       }, 300);
     },
+
+    async handleExportPdf() {
+      // const element = document.querySelector('.pdfContainer');
+
+      // // 使用 html2canvas 将 element 的内容转换为一个 canvas
+      // const canvas = await html2canvas(element);
+
+      // // 创建一个 jsPDF 实例
+      // const pdf = new jsPDF('p', 'mm', 'a4');
+
+      // // 将 canvas 转换为 PDF
+      // const imgData = canvas.toDataURL('image/png');
+      // const imgProps = pdf.getImageProperties(imgData);
+      // const pdfWidth = pdf.internal.pageSize.getWidth();
+      // const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+      // pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+
+      // // 保存 PDF
+      // pdf.save('download.pdf');
+
+      // toast 提示
+
+      this.$message.info('正在初始化导出，请稍后')
+
+      const pdfPages = document.querySelectorAll('.pdf-page')
+
+      // 遍历 pdfPages 每一项，如果 temp1.firstChild.isRendered，执行 renderPage 和 renderHighlightBlocks 操作
+      for (let i = 0; i < pdfPages.length; i++) {
+        const page = pdfPages[i];
+        if (!page.firstChild.isRendered) {
+          await this.renderPage(i + 1, page.firstChild)
+          await this.renderHighlightBlocks(i + 1, page.firstChild)
+        }
+      }
+
+      // 使用 html2canvas pdfPages 每一项内容转换为一个 canvas，每页的的框高同 pdfPage 的高度
+
+      const pdf = new jsPDF('p', 'mm', 'a4');
+
+      for (let i = 0; i < pdfPages.length; i++) {
+        this.$message.info(`正在导出第 ${i} 页`)
+        const page = pdfPages[i];
+        const canvas = await html2canvas(page, {
+          scale: 1,
+          useCORS: true,
+          allowTaint: true,
+          logging: true,
+        });
+
+        const imgData = canvas.toDataURL('image/png');
+        const imgProps = pdf.getImageProperties(imgData);
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+
+        // 保存 PDF
+        pdf.addPage();
+      }
+
+      pdf.save('download.pdf');
+    }
   },
 };
 </script>
@@ -314,11 +378,6 @@ export default {
   flex-grow: 1;
   background-color: #f4f5f5;
 }
-/* .pdfContainer {
-  height: 100%;
-  width: 100%;
-  overflow-y: scroll;
-} */
 .pdf-page {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
   margin: 40px 0;

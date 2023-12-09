@@ -5,6 +5,7 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
+    "postbuild": "cp -r dist ../paper-match-backend/static",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
@@ -12,6 +13,8 @@
     "core-js": "^3.8.3",
     "element-ui": "^2.15.14",
     "fs-extra": "^11.2.0",
+    "html2canvas": "^1.4.1",
+    "html2pdf.js": "^0.10.1",
     "jspdf": "^2.5.1",
     "pdfjs-dist": "^4.0.269",
     "vue": "^2.6.14",

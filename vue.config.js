@@ -3,4 +3,9 @@ module.exports = defineConfig({
   transpileDependencies: true,
   publicPath: './', // 相对路径、CDN路径
   outputDir: 'dist',
+  devServer: {
+    client: {
+      overlay: false
+    }
+  }
 })

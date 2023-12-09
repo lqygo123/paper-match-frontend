@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <Sidebar />
+    <Sidebar v-if="showSidebar" />
     <div class="main-con">
       <router-view/>
     </div>
@@ -16,6 +16,26 @@ export default {
   components: {
     Sidebar
   },
+  data() {
+    return {
+      showSidebar: this.$route.name !== 'login'
+    };
+  },
+  mounted() {
+    console.log('mounted', this.$route);
+  },
+  watch: {
+    '$route'(to) {
+      console.log('watch $route', to);
+      // 如果当前路由是登录页面，不显示 Sidebar
+      this.showSidebar = to.name !== 'login';
+    }
+  },
+  errorCaptured(err, vm, info) {
+    // 错误处理逻辑...
+    console.error(err, info);
+    return false; // 阻止错误继续向上冒泡
+  }
 };
 </script>
 

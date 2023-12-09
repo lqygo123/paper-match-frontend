@@ -6,13 +6,15 @@ import FileUpload from './components/FileUpload.vue';
 import ReportDetail from './pages/ReportDetail.vue'
 import ReportList from './pages/ReportList.vue';
 import ElementUI from 'element-ui';
+import login from './pages/login.vue';
 import 'element-ui/lib/theme-chalk/index.css';
 
 Vue.use(VueRouter);
 Vue.use(ElementUI);
 
 const routes = [
-  { path: '/', redirect: '/file-upload' },
+  { path: '/', redirect: '/login', name: 'login' },
+  { path: '/login', component: login, name: 'login' },
   { path: '/pdf-preview', component: PDFPreview },
   { path: '/report-list', component: ReportList },
   { path: '/file-upload', component: FileUpload },

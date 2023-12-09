@@ -17,12 +17,17 @@
         <span>查看报告</span>
         <!-- <router-link to="/report-list"></router-link> -->
       </el-menu-item>
+      <div class="logout" @click="logout">
+        <i class="el-icon-switch-button"></i>
+        <span>退出登录</span>
+      </div>
     </el-menu>
   </div>
 </template>
 
 <script>
 // import HelloWorld from './components/HelloWorld.vue';
+import { deleteToken } from "../apis";
 
 export default {
   // eslint-disable-next-line vue/multi-word-component-names
@@ -35,7 +40,9 @@ export default {
       activeIndex: "/file-upload",
     };
   },
-  mounted() {},
+  mounted() {
+
+  },
   methods: {
     handleSelect(key) {
       this.activeIndex = key;
@@ -44,6 +51,15 @@ export default {
         () => {},
         () => {}
       );
+    },
+
+    logout() {
+      deleteToken()
+      // this.$router.push(
+      //   "/login",
+      //   () => {},
+      //   () => {}
+      // );
     },
   },
 };
