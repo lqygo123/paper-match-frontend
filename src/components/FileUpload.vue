@@ -1,6 +1,13 @@
 <template>
   <div id="file-upload">
     <div
+      class="compire-loading"
+      v-if="isCompire"
+    >
+      结果对比中，请耐心等待...
+    </div>
+
+    <div
       id="mode-switch"
       class="file-upload-tab"
     >
@@ -94,7 +101,6 @@
         </div>
       </div>
 
-
       <div
         v-if="files.length"
         class="file-list"
@@ -124,7 +130,8 @@
       <el-button
         type="primary"
         @click="handleCompire"
-      >执行对比</el-button>
+      >执行对比 
+    </el-button>
     </div>
 
     <!-- <div class="compire-results">
@@ -153,6 +160,7 @@ export default {
       files: [],
       skipFile: null,
       compireResults: [],
+      isCompire: false,
     };
   },
   watch: {
@@ -287,12 +295,9 @@ export default {
         return;
       }
 
-      const loading = this.$loading({
-        lock: true,
-        text: '比对执行中，请耐心等待',
-        spinner: 'el-icon-loading',
-        background: 'rgba(0, 0, 0, 0.7)'
-      });
+      this.isCompire = true;
+      // this.$message(`开始对比，生成结果需要一段时间，请耐心等待....`)
+
       const fileIds = this.files.map((file) => file.fileId);
       try {
         for (let i = 0; i < fileIds.length; i++) {
@@ -300,16 +305,18 @@ export default {
             if (i === j) {
               continue;
             }
+            const msg = this.$message(`正在对比 ${this.files[i].name} 和 ${this.files[j].name}`, 0)
             const res = await this.execCompire(fileIds[i], fileIds[j], this.skipFile && this.skipFile.fileId);
-
-            console.log('execCompire', res)
+            msg.close()
             this.compireResults.push(res);
           }
         }
-        loading.close();
+        this.isCompire = false
         this.handleGenerateReport()
       } catch (error) {
-        alert('对比失败请打开调试控制台查看具体报错信息')
+        console.log(error);
+        this.isCompire = false
+        this.$message.error('对比失败请打开调试控制台查看具体报错信息')
       }
     },
 
@@ -561,5 +568,20 @@ export default {
   line-height: 21px;
   font-weight: 400;
   cursor: pointer;
+}
+
+.compire-loading {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0, 0.34);
+  color: #fff;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
 }
 </style>
