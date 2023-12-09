@@ -42,6 +42,7 @@ export default {
         this.$router.push('/file-upload');
       } catch (error) {
         // 登录失败，显示错误信息
+        this.$message.error(error.message);
         console.error(error);
       }
     }
