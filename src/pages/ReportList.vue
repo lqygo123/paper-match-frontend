@@ -191,7 +191,20 @@ export default {
   border-radius: 8px;
   padding: 24px;
   margin: 24px;
+  height: calc(100% - 48px);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
 }
+
+.report-list {
+  flex-grow: 1;
+  overflow: auto;
+  width: 100%;
+}
+
 ::v-deep .el-button--primary {
   background-color: #007bff;
   border-color: #007bff;

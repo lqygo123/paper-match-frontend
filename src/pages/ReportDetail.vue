@@ -121,6 +121,7 @@
     </div>
     <div class="bottom-con">
       <Button v-if="mode === 'detail'" @click="handleEdit">编辑</Button>
+      <Button v-if="mode === 'detail'" @click="exportPdf">导出报告</Button>
       <Button v-if="mode === 'edit'" @click="handleSave">保存</Button>
     </div>
 
@@ -131,6 +132,8 @@
 
 <script>
 import { getReportDetail, getDuplicates, saveReport } from "../apis";
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 
 export default {
   name: "ReportDetail",
@@ -204,6 +207,34 @@ export default {
     handleSave() {
       this.mode = "detail";
       saveReport(this.id, this.metaInfo);
+    },
+
+    async exportPdf() {
+      const element = document.querySelector('.main-con');
+      const bottomCon = document.querySelector('.bottom-con');
+
+      const originalDisplay = bottomCon.style.display;
+      bottomCon.style.display = 'none';
+      const canvas = await html2canvas(element);
+      const imgData = canvas.toDataURL('image/png');
+      bottomCon.style.display = originalDisplay;
+
+      // 获取 .main-con 元素的宽度和高度（转换为毫米）
+      const width = element.offsetWidth * 0.264583;
+      const height = element.offsetHeight * 0.264583;
+
+      // 创建一个与 .main-con 元素大小一致的 jsPDF 实例
+      const pdf = new jsPDF({
+        orientation: height > width ? 'portrait' : 'landscape',
+        unit: 'mm',
+        format: [width, height]
+      });
+
+      // 将图片添加到 jsPDF 实例
+      pdf.addImage(imgData, 'PNG', 0, 0, width, height);
+
+      // 保存 PDF
+      pdf.save('report.pdf');
     },
   },
 };
