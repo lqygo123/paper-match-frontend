@@ -55,6 +55,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  overflow: hidden;
 }
 .main-con {
   flex: 1;

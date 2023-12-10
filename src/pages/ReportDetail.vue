@@ -1,80 +1,14 @@
 <template>
   <div class="report-detail">
-    <div v-if="mode === 'detail'">
-      <div class="title"><span>xxxx</span>项目标书对比报告</div>
-      <div class="report-header">
-        <div class="header-item">
-          项目名称：<span>{{ metaInfo?.projectName }}</span>
-        </div>
-        <div class="header-item">
-          招标编号：<span>{{ metaInfo?.biddingNumber }}</span>
-        </div>
-        <div class="header-item">
-          招标人：<span>{{ metaInfo?.biddingCompany }}</span>
-        </div>
-        <div class="header-item">
-          参与公司：<span>{{ metaInfo?.participatingCompany }}</span>
-        </div>
-        <div class="header-item">
-          时间：<span>{{ metaInfo?.time }}</span>
-        </div>
-        <div class="header-item">
-          提交时间：<span>{{ reportTime }}</span>
-        </div>
-      </div>
-      <table>
-        <thead>
-          <tr>
-            <td>序号</td>
-            <td>对比结果</td>
-            <td>原标公司</td>
-            <td>对比公司</td>
-            <td>查重率</td>
-            <td>图片相似张数</td>
-            <td>相似句子数量</td>
-          </tr>
-        </thead>
-        <tbody>
-          <tr
-            @click="handleResultClick(result)"
-            v-for="(result, index) in results"
-            :key="index"
-          >
-            <td>{{ index + 1 }}</td>
-            <td>对比结果</td>
-            <td>{{ result.file1 }}</td>
-            <td>{{ result.file2 }}</td>
-            <td><a href="">{{result.same}}</a></td>
-            <td><a href="">90</a></td>
-            <td><a href="">90</a></td>
-          </tr>
-        </tbody>
-      </table>
-      <!-- <div class="compire-results">
-        <div
-          class="compire-result-item"
-          @click="handleResultClick(result._id)"
-          v-for="(result, index) in results"
-          :key="index"
-        >
-          <div>对比结果</div>
-          <div>文件1: {{ decodeURIComponent(result.biddingFileName) }}</div>
-          <div>文件2: {{ decodeURIComponent(result.targetFileName) }}</div>
-          <div>相似度: {{ Math.random() }}</div>
-        </div>
-      </div> -->
-      <div class="buttons">
-        <Button @click="handleEdit">编辑</Button>
-        <Button>下载</Button>
-        <!-- <Button @click="handleSave">保存</Button> -->
-      </div>
+
+    <div class="header-con">
+      <div class="header-desc"> {{ mode === 'edit' ? '编辑报告' : '查重报告结果' }}</div>
     </div>
-    <div v-if="mode === 'edit'" style="text-align: center">
-      <el-form
+    <div class="main-con">
+      <!-- <el-form
+        v-if="mode === 'edit'"
         ref="form"
         :model="metaInfo"
-        label-width="82px"
-        style="width: 300px; display: inline-block"
       >
         <el-form-item label="项目名称：">
           <el-input v-model="metaInfo.projectName"></el-input>
@@ -94,33 +28,104 @@
         <el-form-item label="提交时间：">
           <el-input v-model="reportTime"></el-input>
         </el-form-item>
-      </el-form>
+      </el-form> -->
+
+      <div class="report-header">
+          <div class="header-item">
+            <span class="label">项目名称：</span>
+            <span v-if="mode === 'detail'" class="content">{{ metaInfo.projectName || '—'  }}</span>
+            <el-input v-if="mode === 'edit'" v-model="metaInfo.projectName" placeholder="请输入项目名称"></el-input>
+          </div>
+          <div class="header-item">
+            <span class="label">招标编号：</span>
+            <span v-if="mode === 'detail'" class="content">{{ metaInfo.biddingNumber || '—'  }}</span>
+            <el-input v-if="mode === 'edit'" v-model="metaInfo.biddingNumber" placeholder="请输入招标编号"></el-input>
+          </div>
+          <div class="header-item">
+            <span class="label">招标人：</span>
+            <span v-if="mode === 'detail'" class="content">{{ metaInfo.biddingCompany || '—'  }}</span>
+            <el-input v-if="mode === 'edit'" v-model="metaInfo.biddingCompany" placeholder="请输入招标人"></el-input>
+          </div>
+          <div class="header-item">
+            <span class="label">参与公司：</span>
+            <span v-if="mode === 'detail'" class="content">{{ metaInfo.participatingCompany || '—'  }}</span>
+            <el-input v-if="mode === 'edit'" v-model="metaInfo.participatingCompany" placeholder="请输入参与公司"></el-input>
+          </div>
+          <div class="header-item">
+            <span class="label">开标时间：</span>
+            <span v-if="mode === 'detail'" class="content">{{ metaInfo.time || '—'  }}</span>
+            <!-- 使用 Date Picker 选择日期，并将相应的string 值设置到 metaInfo.time  -->
+            <el-date-picker
+              v-if="mode === 'edit'"
+              v-model="metaInfo.time"
+              type="date"
+              placeholder="选择日期"
+              value-format="yyyy-MM-dd"
+              format="yyyy-MM-dd"
+            ></el-date-picker>
+          </div>
+          <div class="header-item">
+            <span class="label">提交时间：</span>
+            <span class="content">{{ reportTime.substring(0, 10) }}</span>
+          </div>
+        </div>
       <el-table
         :data="results"
         border
         style="width: 100%"
         @row-click="handleResultClick"
       >
-        <el-table-column align="center" prop="compare" label="序号">
+        <el-table-column
+          align="center"
+          label="编号"
+          width="50"
+        >
+          <template slot-scope="scope">
+            <span>{{ scope.$index + 1 }}</span>
+          </template>
         </el-table-column>
-        <el-table-column align="center" prop="compare" label="对比结果">
+        <el-table-column
+          align="center"
+          prop="biddingFileName"
+          label="招标公司"
+        >
         </el-table-column>
-        <el-table-column align="center" prop="file1" label="原标公司">
+        <el-table-column
+          align="center"
+          prop="targetFileName"
+          label="对比公司"
+        >
         </el-table-column>
-        <el-table-column align="center" prop="file2" label="对比公司">
+        <el-table-column
+          align="center"
+          prop="repetitionRate"
+          label="重复率"
+        >
         </el-table-column>
-        <el-table-column align="center" prop="same" label="查重率">
+        <el-table-column
+          align="center"
+          prop="sameImage"
+          label="图片相似(张)"
+        >
         </el-table-column>
-        <el-table-column align="center" prop="same" label="图片相似张数">
-        </el-table-column>
-        <el-table-column align="center" prop="same" label="相似句子数量">
+        <el-table-column
+          align="center"
+          prop="sameSentence"
+          label="相似句子(条)"
+        >
         </el-table-column>
       </el-table>
-      <div class="buttons">
-        <!-- <Button @click="handleEdit">编辑</Button> -->
-        <Button @click="handleSave">保存</Button>
-      </div>
+
+
+
     </div>
+    <div class="bottom-con">
+      <Button v-if="mode === 'detail'" @click="handleEdit">编辑</Button>
+      <Button v-if="mode === 'edit'" @click="handleSave">保存</Button>
+    </div>
+
+
+
   </div>
 </template>
 
@@ -173,37 +178,14 @@ export default {
       this.results = results.data.map((item) => {
         const tmp = {
           ...item,
-          compare: "对比结果",
-          file1: '文件1:'+decodeURIComponent(item.biddingFileName),
-          file2: '文件2:'+decodeURIComponent(item.targetFileName),
-          same: '相似度: '+Math.random(),
+          biddingFileName: decodeURIComponent(item.biddingFileName),
+          targetFileName: decodeURIComponent(item.targetFileName),
+          repetitionRate: `${parseFloat(item.abstract.repetitionRate) * 100}`.substring(0, 5) + '%',
+          sameImage: `${item.abstract.imageRepetitionCount}/${item.abstract.imageTotal}`,
+          sameSentence: `${item.abstract.textRepetitionCount}/${item.abstract.textTotal}`,
         };
         return tmp;
       });
-
-      // 测试数据  没用可删
-      // this.reportTime = "reportTime";
-      // this.metaInfo = {
-      //   projectName: "projectName",
-      //   biddingNumber: "biddingNumber",
-      //   biddingCompany: "biddingCompany",
-      //   participatingCompany: "participatingCompany",
-      //   time: "time",
-      // };
-      // this.results = [
-      //   {
-      //     compare: "对比文件",
-      //     file1: "文件1",
-      //     file2: "文件2",
-      //     same: Math.random(),
-      //   },
-      //   {
-      //     compare: "对比文件",
-      //     file1: "文件1",
-      //     file2: "文件2",
-      //     same: Math.random(),
-      //   },
-      // ];
     },
 
     handleResultClick(row) {
@@ -231,17 +213,64 @@ export default {
 .report-detail {
   background: #fff;
   border-radius: 8px;
-  padding: 24px;
+  margin: 24px;
+  height: calc(100% - 48px);
+  overflow-y: auto;
+  position: relative;
 }
+
+.report-detail .header-con {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 60px;
+  width: 100%;
+  border-bottom: 1px solid #e6e6e6;
+}
+
+.report-detail .header-con .header-desc {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+
+.report-detail .bottom-con {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 60px;
+  width: 100%;
+  border-top: 1px solid #e6e6e6;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.report-detail .main-con {
+  margin-top: 60px;
+  margin-bottom: 60px;
+  height: calc(100% - 120px);
+  overflow-y: auto;
+  padding: 24px;
+  background: #fff;
+}
+
 .buttons {
   text-align: center;
 }
-.buttons button {
+
+.bottom-con button {
   border: none;
   bottom: 0px;
   background: #007bff;
   width: 90px;
-  height: 40px;
+  height: 32px;
   border-radius: 4px;
   font-size: 16px;
   color: #fff;
@@ -249,27 +278,56 @@ export default {
   line-height: 21px;
   font-weight: 400;
   cursor: pointer;
-  margin-top: 24px;
   margin-right: 20px;
 }
+
 .buttons button:last-child {
   margin-right: 0;
 }
+
 .title {
   font-size: 28px;
   text-align: center;
   margin-bottom: 30px;
 }
+
 .title span {
   border-bottom: 2px solid #000;
 }
+
+.report-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+} 
+
 .report-header .header-item {
+  height: 40px;
+  flex-basis: 50%;
   font-size: 18px;
-  margin-bottom: 12px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  position: relative;
 }
-.report-header .header-item span {
-  border-bottom: 2px solid #000;
+
+.header-item .label {
+  display: inline-block;
+  width: 120px;
 }
+
+.header-item .el-input {
+  display: inline-block;
+  width: calc(100% - 140px);
+}
+.header-item .el-date-editor {
+  display: inline-block;
+  width: calc(100% - 140px);
+}
+
 table {
   width: 100%;
   box-sizing: border-box;
@@ -277,29 +335,34 @@ table {
   border-collapse: collapse;
   margin-top: 24px;
 }
+
 table * {
   padding: 0;
   margin: 0;
   box-sizing: border-box;
   border-spacing: 0;
 }
+
 table tr {
   height: 36px;
   line-height: 36px;
   text-align: center;
 }
+
 table tr td {
   padding: 0 10px;
   border-bottom: 1px solid #000;
   border-right: 1px solid #000;
 }
+
 table tr td:last-child {
   border-right: 0px solid #000;
 }
+
 table tbody tr:last-child td {
   border-bottom: 0px solid #000;
 }
+
 table tr td a {
   color: #007bff;
-}
-</style>
+}</style>

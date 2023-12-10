@@ -7,10 +7,9 @@
     <div class="res-list" id="right" :style="'width:' + leftWidth + 'px'">
       <!-- <div class="line" v-drag></div> -->
       <div class="header">
-        <button @click="handleExportPdf">导出</button>
         <div class="title">重复率</div>
         <div class="content">
-          {{ textRepetitionCount }} / {{ pdf1TextTotal }}
+          {{ compireResult.abstract.textRepetitionCount }} / {{ compireResult.abstract.textTotal }}
         </div>
       </div>
       <div
@@ -35,6 +34,8 @@
         </div>
       </div>
     </div>
+
+    <el-button class="export-btn" @click="handleExportPdf" type="primary">导出</el-button>
   </div>
 </template>
 
@@ -46,7 +47,7 @@ import { DOMAIN } from '../../config'
 import { getDuplicateDetail } from '../apis'
 
 // const data = require("../../jsons/output_digital.json");
-const data = require("../../jsons/output_scan_transfromed.json");
+// const data = require("../../jsons/output_scan_transfromed.json");
 
 const parseCord = (cord, height, factor) => {
   // eslint-disable-next-line no-unused-vars
@@ -67,11 +68,13 @@ export default {
       leftWidth: document.documentElement.clientWidth * 0.3,
       highlightedBlock: {},
       rendedPages: {},
-      MockMatchRes: data.textRepetitions || data.ocrRepetitions,
-      ocrPages: data.pdf1Pages || [],
-      pdf1TextTotal: data.pdf1TextTotal,
-      textRepetitionCount: data.textRepetitionCount,
-      compireResult: {},
+      MockMatchRes: [],
+      ocrPages: [],
+      pdf1TextTotal: 0,
+      textRepetitionCount: 0,
+      compireResult: {
+        abstract: {}
+      },
     };
   },
   async mounted() {
@@ -302,31 +305,8 @@ export default {
     },
 
     async handleExportPdf() {
-      // const element = document.querySelector('.pdfContainer');
-
-      // // 使用 html2canvas 将 element 的内容转换为一个 canvas
-      // const canvas = await html2canvas(element);
-
-      // // 创建一个 jsPDF 实例
-      // const pdf = new jsPDF('p', 'mm', 'a4');
-
-      // // 将 canvas 转换为 PDF
-      // const imgData = canvas.toDataURL('image/png');
-      // const imgProps = pdf.getImageProperties(imgData);
-      // const pdfWidth = pdf.internal.pageSize.getWidth();
-      // const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-      // pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-
-      // // 保存 PDF
-      // pdf.save('download.pdf');
-
-      // toast 提示
-
       this.$message.info('正在初始化导出，请稍后')
-
       const pdfPages = document.querySelectorAll('.pdf-page')
-
-      // 遍历 pdfPages 每一项，如果 temp1.firstChild.isRendered，执行 renderPage 和 renderHighlightBlocks 操作
       for (let i = 0; i < pdfPages.length; i++) {
         const page = pdfPages[i];
         if (!page.firstChild.isRendered) {
@@ -334,8 +314,6 @@ export default {
           await this.renderHighlightBlocks(i + 1, page.firstChild)
         }
       }
-
-      // 使用 html2canvas pdfPages 每一项内容转换为一个 canvas，每页的的框高同 pdfPage 的高度
 
       const pdf = new jsPDF('p', 'mm', 'a4');
 
@@ -552,8 +530,9 @@ export default {
 /* add -12-03*/
 .header {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
+  align-items: center;
+  justify-content: space-around;
+  /* align-items: flex-end; */
   margin-bottom: 20px;
 }
 .title {
@@ -607,5 +586,10 @@ export default {
   color: #007bff;
   border: 1px solid #007bff;
   bottom: 70px;
+}
+.export-btn {
+  position: fixed;
+  right: 32%;
+  bottom: 20px;
 }
 </style>

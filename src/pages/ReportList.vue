@@ -190,12 +190,10 @@ export default {
   background: #fff;
   border-radius: 8px;
   padding: 24px;
+  margin: 24px;
 }
 ::v-deep .el-button--primary {
   background-color: #007bff;
   border-color: #007bff;
-}
-::v-deep .el-form--inline .el-form-item {
-  margin-right: 20px;
 }
 </style>
