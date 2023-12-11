@@ -5,12 +5,12 @@
       <div class="login-from">
         <div class="title">用户登录</div>
         <div class="input-con">
-          <el-input v-model="username" type="text" placeholder="请输入用户名">
+          <el-input v-model="username" type="text" placeholder="请输入用户名" @keydown.enter="handleSubmit">
             <i slot="prefix" class="el-input__icon el-icon-user"></i>
           </el-input>
         </div>
         <div class="input-con">
-          <el-input v-model="password" type="password" placeholder="请输入密码">
+          <el-input v-model="password" type="password" placeholder="请输入密码" @keydown.enter="handleSubmit">
             <i slot="prefix" class="el-input__icon el-icon-lock"></i>
           </el-input>
         </div>
@@ -34,16 +34,31 @@ export default {
       password: ''
     };
   },
+  mounted() {
+    // 监听键盘按下事件
+    document.addEventListener('keydown', this.handleKeyDown);
+  },
+  beforeDestroy() {
+    // 移除键盘按下事件监听
+    document.removeEventListener('keydown', this.handleKeyDown);
+  },
   methods: {
     async handleSubmit() {
       try {
         await login(this.username, this.password);
+        this.$message.success('登录成功')
         // 登录成功，跳转到主页
         this.$router.push('/file-upload');
       } catch (error) {
-        // 登录失败，显示错误信息
-        this.$message.error(error.message);
+        // 登录失败，显示 服务端返回内容的错误信息
+        this.$message.error((error.response && error.response.data && error.response.data.message) || error.message)
         console.error(error);
+      }
+    },
+    handleKeyDown(event) {
+      // 按下回车键（keyCode 为 13）时执行登录
+      if (event.keyCode === 13) {
+        this.handleSubmit();
       }
     }
   }

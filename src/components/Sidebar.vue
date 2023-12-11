@@ -15,12 +15,14 @@
       <el-menu-item index="/report-list">
         <i class="el-icon-tickets"></i>
         <span>查看报告</span>
-        <!-- <router-link to="/report-list"></router-link> -->
+      </el-menu-item>
+      <el-menu-item v-if="$store.role === 'admin'" index="/user-admin">
+        <i class="el-icon-user"></i>
+        <span>用户管理</span>
       </el-menu-item>
       <el-menu-item index="logout">
         <i class="el-icon-switch-button"></i>
         <span>退出登录</span>
-        <!-- <router-link to="/report-list"></router-link> -->
       </el-menu-item>
     </el-menu>
   </div>
@@ -28,7 +30,7 @@
 
 <script>
 // import HelloWorld from './components/HelloWorld.vue';
-import { deleteToken } from "../apis";
+import { logout } from "../apis";
 
 export default {
   // eslint-disable-next-line vue/multi-word-component-names
@@ -46,32 +48,18 @@ export default {
   },
   methods: {
     handleSelect(key) {
-
-
-
       this.activeIndex = key;
-
       if (key === 'logout') {
-        this.logout()
+        logout()
         this.$router.push(
           "/login"
         );
         return
       }
-
       this.$router.push(
         key
       );
-    },
-
-    logout() {
-      deleteToken()
-      // this.$router.push(
-      //   "/login",
-      //   () => {},
-      //   () => {}
-      // );
-    },
+    }
   },
 };
 </script>
