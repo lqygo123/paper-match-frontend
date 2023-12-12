@@ -82,7 +82,9 @@ const createReport = async (results) => {
 }
 
 const execDuplicate = async (requestOptions) => {
-  return await authedRequest(() => instance.post(`api/v1/duplicate/exec-duplicate`, requestOptions));
+  return await authedRequest(() => instance.post(`api/v1/duplicate/exec-duplicate`, requestOptions, {
+    timeout: 1000 * 60 * 20
+  }));
 }
 
 const login = async (username, password) => {
