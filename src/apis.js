@@ -87,6 +87,17 @@ const execDuplicate = async (requestOptions) => {
   }));
 }
 
+const createBatchDuplicate = async (taskList, reportMetaInfo = {}) => {
+  return await authedRequest(() => instance.post(`api/v1/duplicate/create-duplicate-task`, {
+    taskList,
+    reportMetaInfo
+  }));
+}
+
+const getCurrentTasks = async () => { 
+  return await authedRequest(() => instance.get(`api/v1/duplicate/current-tasks`));
+}
+
 const login = async (username, password) => {
   const response = await instance.post(`api/v1/user/login`, { username, password });
   if (response.data.code === 0) {
@@ -119,5 +130,9 @@ export {
   login,
   getUsers,
   updateUser,
+
+  createBatchDuplicate,
+  getCurrentTasks,
+
   logout
 }

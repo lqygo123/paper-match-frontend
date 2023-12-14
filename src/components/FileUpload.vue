@@ -150,7 +150,7 @@
 </template>
 
 <script>
-import { uploadFile, createReport, execDuplicate } from "../apis";
+import { uploadFile, createReport, execDuplicate, createBatchDuplicate, getCurrentTasks } from "../apis";
 
 export default {
   name: "FileUpload",
@@ -295,24 +295,41 @@ export default {
         return;
       }
 
-      this.isCompire = true;
+      // this.isCompire = true;
       // this.$message(`开始对比，生成结果需要一段时间，请耐心等待....`)
 
-      const fileIds = this.files.map((file) => file.fileId);
+      // const fileIds = this.files.map((file) => file.fileId);
+
+      const taskList = [];
+
       try {
-        for (let i = 0; i < fileIds.length; i++) {
-          for (let j = 0; j < fileIds.length; j++) {
+        for (let i = 0; i < this.files.length; i++) {
+          for (let j = 0; j < this.files.length; j++) {
             if (i === j) {
               continue;
             }
-            const msg = this.$message(`正在对比 ${this.files[i].name} 和 ${this.files[j].name}`, 0)
-            const res = await this.execCompire(fileIds[i], fileIds[j], this.skipFile && this.skipFile.fileId);
-            msg.close()
-            this.compireResults.push(res);
+            taskList.push({
+              biddingFileId: this.files[i].fileId,
+              targetFileId: this.files[j].fileId,
+              skipFileId: this.skipFile && this.skipFile.fileId,
+              biddingFileName: this.files[i].name,
+              targetFileName: this.files[j].name,
+              mode: this.mode,
+            })
           }
         }
-        this.isCompire = false
-        this.handleGenerateReport()
+
+        const res = await createBatchDuplicate(taskList)
+        console.log('createBatchDuplicate res', res)
+
+        setInterval(async () => {
+          const taskRes = await getCurrentTasks()
+          console.log('当前运行', taskRes.data.running.map(item => item.name).join('、'))
+          console.log('排队中', taskRes.data.queue.map(item => item.name).join('、'))
+        }, 100);
+
+        // this.isCompire = false
+        // this.handleGenerateReport()
       } catch (error) {
         console.log(error);
         this.isCompire = false
@@ -348,8 +365,6 @@ export default {
         requestOptions.skipFileId = skipFileId
       }
 
-      // const res = await axios.post(`${API_BASE_URL}/duplicate/exec-duplicate`, requestOptions);
-      // console.log("execCompire", res.data);
       console.log("execCompire", requestOptions);
       const res = await execDuplicate(requestOptions);
       return res.data;
