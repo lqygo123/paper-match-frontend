@@ -2,22 +2,31 @@
   <div class="task-list-page">
     <div class="task-list-header">查重进度</div>
     <div class="task-list">
-      <div class="task-list-item" v-if="runningTaskList.length || waitingTaskList.length">
-        <div class="task-list-item-state">状态</div>
-        <div class="task-list-item-file">项目名称</div>
-        <!-- <div class="task-list-item-file">比对文件</div> -->
+      <div class="task-list-item bold" v-if="groupedList.length">
+        <div class="task-list-item-name">项目名称</div>
+        <div class="task-list-item-creator">创建者</div>
+        <div class="task-list-item-process">比对状态</div>
+        <div class="task-list-item-time">上传时间</div>
       </div>
       <div class="no-task" v-else>
         暂无任务
       </div>
-      <div class="task-list-item" v-for="task in runningTaskList" :key="task.id">
+
+      <div class="task-list-item" v-for="batchItem in groupedList" :key="batchItem.batchId + Math.random()">
+        <div class="task-list-item-name">{{ batchItem.projectName }}</div>
+        <div class="task-list-item-creator">{{ batchItem.creator.role === 'admin' ? '管理员' : batchItem.creator.name || '-' }}</div>
+        <div class="task-list-item-process">{{ batchItem.total - batchItem.waitting - batchItem.running }}/{{ batchItem.total }}</div>
+        <div class="task-list-item-time">{{ batchItem.createAt }}</div>
+      </div>
+
+      <!-- <div class="task-list-item" v-for="task in runningTaskList" :key="task.id">
         <div class="task-list-item-state green">对比中</div>
         <div class="task-list-item-file">{{ task.reportMetaInfo.projectName }}</div>
       </div>
       <div class="task-list-item" v-for="task in waitingTaskList" :key="task.id">
         <div class="task-list-item-state">等待中</div>
         <div class="task-list-item-file">{{ task.reportMetaInfo.projectName }}</div>
-      </div>
+      </div> -->
     </div>
   </div>
 </template>
@@ -25,6 +34,7 @@
 <script>
 // import HelloWorld from './components/HelloWorld.vue';
 import { getCurrentTasks } from '../apis';
+import { formateTime } from '../utils'
 
 export default {
   name: 'TaskList',
@@ -37,8 +47,10 @@ export default {
 
     // task item
     // {
+    //   "batchId": "batch-1702735935512mv292u7xo6"
     //   "taskId": "1702695389228ct5wqeb4z7q",
     //   "name": "ocr 测试文档3.pdf 比对 ocr 测试文档1.pdf",
+    //   "batchTotal": 6,
     //   "reportMetaInfo": {
     //       "projectName": "zxc",
     //       "biddingNumber": "",
@@ -47,17 +59,28 @@ export default {
     //       "time": ""
     //   },
     //   "createAt": 1702695389228,
-    //   "biddingFileId": "657d11dadb83b81ae519c42e",
-    //   "targetFileId": "657d11dadb83b81ae519c42c",
-    //   "skipFileId": null,
-    //   "biddingFileName": "ocr 测试文档3.pdf",
-    //   "targetFileName": "ocr 测试文档1.pdf",
-    //   "mode": "digital",
     //   "isRunning": true
     // }
-
       runningTaskList: [],
       waitingTaskList: [],
+
+
+//    {
+//     "projectName": "czscsc",
+//     "biddingNumber": "",
+//     "biddingCompany": "",
+//     "participatingCompany": "",
+//     "time": "",
+//     "createAt": 1702740559836,
+//     "total": 12,
+//     "waitting": 10,
+//     "running": 1,
+//     "creator": {
+//         "role": "admin"
+//     },
+//      "batchId": "batch-1702740559836fwadrdna2wi"
+//      }
+      groupedList: [],
     };
   },
   created() {
@@ -65,6 +88,83 @@ export default {
     this.updateListIntervalId = setInterval(() => {
       this.getTaskList();
     }, 1000);
+
+    // this.groupedList = [
+    //   {
+    //     projectName: '项目1',
+    //     biddingNumber: '123',
+    //     biddingCompany: '123',
+    //     participatingCompany: '123',
+    //     time: '123',
+    //     createAt: formateTime(1702740559836),
+    //     total: 12,
+    //     waitting: 10,
+    //     running: 1,
+    //     creator: {
+    //       role: 'admin',
+    //     },
+    //     batchId: 'batch-1702740559836fwadrdna2wi',
+    //   },
+    //   {
+    //     projectName: '项目2',
+    //     biddingNumber: '123',
+    //     biddingCompany: '123',
+    //     participatingCompany: '123',
+    //     time: '123',
+    //     createAt: formateTime(1702740559836),
+    //     total: 12,
+    //     waitting: 10,
+    //     running: 1,
+    //     creator: {
+    //       role: 'admin',
+    //     },
+    //     batchId: 'batch-1702740559836fwadrdna2wi',
+    //   },
+    //   {
+    //     projectName: '项目3',
+    //     biddingNumber: '123',
+    //     biddingCompany: '123',
+    //     participatingCompany: '123',
+    //     time: '123',
+    //     createAt: formateTime(1702740559836),
+    //     total: 12,
+    //     waitting: 10,
+    //     running: 1,
+    //     creator: {
+    //       role: 'admin',
+    //     },
+    //     batchId: 'batch-1702740559836fwadrdna2wi',
+    //   },
+    //   {
+    //     projectName: '项目4',
+    //     biddingNumber: '123',
+    //     biddingCompany: '123',
+    //     participatingCompany: '123',
+    //     time: '123',
+    //     createAt: formateTime(1702740559836),
+    //     total: 12,
+    //     waitting: 10,
+    //     running: 1,
+    //     creator: {
+    //       role: 'admin',
+    //     },
+    //     batchId: 'batch-1702740559836fwadrdna2wi',
+    //   },
+    //   {
+    //     projectName: '项目5',
+    //     biddingNumber: '123',
+    //     biddingCompany: '123',
+    //     participatingCompany: '123',
+    //     time: '123',
+    //     createAt: formateTime(1702740559836),
+    //     total: 12,
+    //     waitting: 10,
+    //     running: 1,
+    //     creator: {
+    //       role: 'admin',
+    //     },
+    //     batchId: 'batch-1702740559836fwadrdna2wi',
+    //   }]
   },
   destroyed() {
     clearInterval(this.updateListIntervalId);
@@ -75,30 +175,44 @@ export default {
       this.runningTaskList = res.data.running;
       this.waitingTaskList = res.data.queue;
 
-      console.log('runningTaskList', this.runningTaskList);
+      const groupedTask = {}
+      this.runningTaskList.forEach((task) => {
+        const batchId = task.batchId;
+        if (!groupedTask[batchId]) {
+          groupedTask[batchId] = {
+            ...task.reportMetaInfo,
+            createAt: formateTime(task.createAt),
+            total: task.batchTotal,
+            waitting: 0,
+            running: 0,
+            creator: task.creator,
+          };
+          groupedTask[batchId].running += 1;
+        }
+      });
+      this.waitingTaskList.forEach((task) => {
+        const batchId = task.batchId;
+        if (!groupedTask[batchId]) {
+          groupedTask[batchId] = {
+            ...task.reportMetaInfo,
+            createAt: formateTime(task.createAt),
+            total: task.batchTotal,
+            waitting: 0,
+            running: 0,
+            creator: task.creator,
+          };
+        }
+        groupedTask[batchId].waitting += 1;
+      });
 
-      // const item = {
-      //   "taskId": "1702695389228ct5wqeb4z7q",
-      //   "name": "ocr 测试文档3.pdf 比对 ocr 测试文档1.pdf",
-      //   "reportMetaInfo": {
-      //       "projectName": "zxc",
-      //       "biddingNumber": "",
-      //       "biddingCompany": "",
-      //       "participatingCompany": "",
-      //       "time": ""
-      //   },
-      //   "createAt": 1702695389228,
-      //   "biddingFileId": "657d11dadb83b81ae519c42e",
-      //   "targetFileId": "657d11dadb83b81ae519c42c",
-      //   "skipFileId": null,
-      //   "biddingFileName": "ocr 测试文档3.pdf",
-      //   "targetFileName": "ocr 测试文档1.pdf",
-      //   "mode": "digital",
-      //   "isRunning": true
-      // }
+      this.groupedList = Object.keys(groupedTask).map((key) => {
+        return {
+          ...groupedTask[key],
+          batchId: key,
+        };
+      });
 
-      // this.runningTaskList = [item, item]
-      // this.waitingTaskList = [item, item, item, item, item, item, item, item, item, item, item, item, item, item, item, item, item, item, item, item, item, item, item, item, item, item, item, item, item, item, item, item, item, item, item, item, item, item, item, item]
+      console.log('groupedList', this.groupedList);
     }
   }
 };
@@ -145,8 +259,30 @@ export default {
   margin-bottom: 10px;
 }
 
-.task-list-item:last-child {
-  margin-bottom: 0;
+.task-list-item.bold {
+  font-weight: bold;
+}
+
+.task-list-item-name {
+  flex-basis: 400px;
+  flex-shrink: 0;
+  flex-grow: 1;
+  text-align: center;
+  overflow: hidden;
+  text-overflow:ellipsis;
+  white-space: nowrap;
+}
+
+.task-list-item-creator {
+  flex-basis: 100px;
+  flex-shrink: 0;
+  text-align: center;
+}
+
+.task-list-item-process {
+  flex-basis: 100px;
+  flex-shrink: 0;
+  text-align: center;
 }
 
 .task-list-item-state {
@@ -165,22 +301,6 @@ export default {
   align-items: center;
   justify-content: center;
   color: #999;
-}
-
-.task-list-item-name {
-  flex-basis: 400px;
-  overflow: hidden;
-  text-overflow:ellipsis;
-  white-space: nowrap;
-  text-align: center;
-  flex-shrink: 0;
-}
-
-.task-list-item-file {
-  flex-grow: 1;
-  text-overflow:ellipsis;
-  white-space: nowrap;
-  text-align: center;
 }
 
 .task-list-bottom {

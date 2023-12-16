@@ -356,11 +356,6 @@ export default {
     },
 
     async handleGenerateReport() {
-      // const res = await axios.post(`${API_BASE_URL}/duplicate/create-report`, {
-      //   results: this.compireResults.map((result) => result._id),
-      // });
-      // console.log("handleGenerateReport", res.data.data);
-
       const res = await createReport(
         this.compireResults.map((result) => result._id)
       )
