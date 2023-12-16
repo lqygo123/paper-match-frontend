@@ -1,16 +1,46 @@
 <template>
   <div id="file-upload">
-    <div
-      class="compire-loading"
-      v-if="isCompire"
+    <!-- metainfo edit modal -->
+    <el-dialog
+      title="编辑报告信息"
+      :visible.sync="showMetaInfoModal"
     >
+      <el-form :model="metaInfo" label-width="80px">
+        <el-form-item label="项目名称">
+          <el-input v-model="metaInfo.projectName"></el-input>
+        </el-form-item>
+        <el-form-item label="招标编号">
+          <el-input v-model="metaInfo.biddingNumber"></el-input>
+        </el-form-item>
+        <el-form-item label="招标人">
+          <el-input v-model="metaInfo.biddingCompany"></el-input>
+        </el-form-item>
+        <el-form-item label="参与公司">
+          <el-input v-model="metaInfo.participatingCompany"></el-input>
+        </el-form-item>
+        <el-form-item label="开标时间">
+          <el-date-picker
+            v-model="metaInfo.time"
+            type="date"
+            placeholder="选择日期"
+            value-format="yyyy-MM-dd"
+            format="yyyy-MM-dd"
+          ></el-date-picker>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="showMetaInfoModal = false">取 消</el-button>
+        <el-button type="primary" @click="handleMetaInfoModalConfirm"
+          >确 定</el-button
+        >
+      </span>
+    </el-dialog>
+
+    <div class="compire-loading" v-if="isCompire">
       结果对比中，请耐心等待...
     </div>
 
-    <div
-      id="mode-switch"
-      class="file-upload-tab"
-    >
+    <div id="mode-switch" class="file-upload-tab">
       <div
         class="file-upload-tab-item"
         @click="mode = 'digital'"
@@ -28,9 +58,7 @@
     </div>
 
     <div class="main-content">
-      <div class="file-upload-header">
-        招标文件（可选）
-      </div>
+      <div class="file-upload-header">招标文件（可选）</div>
       <div class="file-upload-desc">
         可选择上传一份招标文件参与查重，与招标文件相同内容不参与查重
       </div>
@@ -57,26 +85,18 @@
         </div>
       </div>
 
-
-      <div
-        v-if="skipFile"
-        class="file-list"
-      >
-        <div
-          class="file-item"
-        >
-          <div class="file-content"> 招标文件 </div>
+      <div v-if="skipFile" class="file-list">
+        <div class="file-item">
+          <div class="file-content">招标文件</div>
           <div class="file-name">{{ skipFile.name }}</div>
           <div class="file-content">{{ skipFile.state }}</div>
-          <div class="file-content"> <el-button @click="deleteSkipFile()">删除</el-button></div>
+          <div class="file-content">
+            <el-button @click="deleteSkipFile()">删除</el-button>
+          </div>
         </div>
       </div>
 
-
-
-      <div class="file-upload-header">
-        投标文件（必选）
-      </div>
+      <div class="file-upload-header">投标文件（必选）</div>
 
       <div
         class="drop-zone"
@@ -101,19 +121,14 @@
         </div>
       </div>
 
-      <div
-        v-if="files.length"
-        class="file-list"
-      >
-        <div
-          class="file-item"
-          v-for="(file, index) in files"
-          :key="index"
-        >
-          <div class="file-content"> 投标文件 </div>
+      <div v-if="files.length" class="file-list">
+        <div class="file-item" v-for="(file, index) in files" :key="index">
+          <div class="file-content">投标文件</div>
           <div class="file-name">{{ file.name }}</div>
           <div class="file-content">{{ file.state }}</div>
-          <div class="file-content"> <el-button @click="deleteFile(index)">删除</el-button></div>
+          <div class="file-content">
+            <el-button @click="deleteFile(index)">删除</el-button>
+          </div>
         </div>
       </div>
 
@@ -127,186 +142,63 @@
     </div>
 
     <div class="buttons-wrap">
-      <el-button
-        type="primary"
-        @click="handleCompire"
-      >执行对比 
-    </el-button>
+      <el-button type="primary" @click="handleCompire">执行对比 </el-button>
     </div>
-
-    <!-- <div class="compire-results">
-      <div
-        class="compire-result-item"
-        v-for="(result, index) in compireResults"
-        :key="index"
-      >
-        <div>对比结果</div>
-        <div>文件1: {{ decodeURIComponent(result.biddingFileName) }}</div>
-        <div>文件2: {{ decodeURIComponent(result.targetFileName) }}</div>
-        <div>相似度: {{ Math.random() }}</div>
-      </div>
-    </div> -->
   </div>
 </template>
 
 <script>
-import { uploadFile, createReport, execDuplicate, createBatchDuplicate, getCurrentTasks } from "../apis";
+import {
+  uploadFile,
+  createReport,
+  execDuplicate,
+  createBatchDuplicate,
+  // getCurrentTasks,
+} from '../apis'
 
 export default {
-  name: "FileUpload",
+  name: 'FileUpload',
   data() {
     return {
-      mode: "digital", // digital | ocr
+      mode: 'digital', // digital | ocr
       files: [],
       skipFile: null,
       compireResults: [],
       isCompire: false,
-    };
+      showMetaInfoModal: false,
+      metaInfo: {
+        projectName: '',
+        biddingNumber: '',
+        biddingCompany: '',
+        participatingCompany: '',
+        time: '',
+      },
+    }
   },
   watch: {
     files: {
       handler() {
-        console.log(this.files);
+        console.log(this.files)
       },
       deep: true,
     },
   },
   methods: {
-    validateFiles(files) {
-      const validTypes = [
-        "application/pdf",
-        // 'application/zip',
-        // 'application/msword',
-        // 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        // 'application/x-zip-compressed',
-        // 'application/x-rar-compressed',
-      ];
-      console.log(files);
-      const validFiles = files.filter((file) => validTypes.includes(file.type));
-      const invalidFiles = files.filter(
-        (file) => !validTypes.includes(file.type)
-      );
-      if (invalidFiles.length) {
-        alert(`仅支持 pdf 格式的文件`);
-      }
-      return validFiles;
-    },
-
-    handleDrop(e) {
-      e.preventDefault();
-      // this.files.push(e.dataTransfer.files[0]);
-      const validatedFile = this.validateFiles(
-        Array.from(e.dataTransfer.files)
-      );
-      if (validatedFile.length) {
-        this.files = [...this.files, ...validatedFile];
-      }
-
-      validatedFile.forEach((file) => {
-        this.uploadFile(file);
-      });
-    },
-
-    handleDropSkipFile(e) {
-      e.preventDefault();
-      // this.files.push(e.dataTransfer.files[0]);
-      const validatedFile = this.validateFiles(
-        Array.from(e.dataTransfer.files)
-      );
-      if (validatedFile.length) {
-        this.skipFile = validatedFile[0];
-      }
-      if (this.skipFile) {
-        this.uploadSkipFile();
-      }
-    },
-
-    handleFile(e) {
-      // this.files.push(e.target.files[0]);
-      const validatedFile = this.validateFiles(Array.from(e.target.files));
-      if (validatedFile.length) {
-        this.files = [...this.files, ...validatedFile];
-      }
-      validatedFile.forEach((file) => {
-        this.uploadFile(file);
-      });
-    },
-    triggerFileInput() {
-      this.$refs.fileInput.click();
-    },
-    deleteFile(index) {
-      this.files.splice(index, 1);
-    },
-
-    async uploadFile(file) {
-      const formData = new FormData();
-      formData.append("file", file, encodeURIComponent(file.name));
-      file.state = "上传中";
-      this.files = [...this.files];
-      try {
-        const res = await uploadFile(formData, (percent) => {
-          console.log(file.name, percent)
-        });
-
-        file.state = "上传成功";
-        file.fileId = res.data._id;
-      } catch (error) {
-        file.state = "上传失败";
-      }
-      this.files = [...this.files];
-    },
-
-    async uploadSkipFile() {
-      const formData = new FormData();
-      formData.append("file", this.skipFile, encodeURIComponent(this.skipFile.name));
-      this.skipFile.state = "上传中";
-      try {
-        const res = await uploadFile(formData, (percent) => {
-          console.log(this.skipFile.name, percent)
-        });
-        this.skipFile.state = "上传成功";
-        this.skipFile.fileId = res.data._id;
-
-        this.skipFile = {
-          ...this.skipFile,
-          name: this.skipFile.name,
-          state: "上传成功",
-          fileId: res.data._id,
-        };
-
-      } catch (error) {
-        this.skipFile = {
-          ...this.skipFile,
-          name: this.skipFile.name,
-          state: "上传失败",
-        };
-      }
-
-    },
-
-    deleteSkipFile() {
-      this.skipFile = null;
-    },
-
-    async handleCompire() {
-
-      if (this.files.length < 2) {
-        alert("请至少上传两个文件");
-        return;
-      }
+    async handleMetaInfoModalConfirm() {
+      this.showMetaInfoModal = false
 
       // this.isCompire = true;
       // this.$message(`开始对比，生成结果需要一段时间，请耐心等待....`)
 
       // const fileIds = this.files.map((file) => file.fileId);
 
-      const taskList = [];
+      const taskList = []
 
       try {
         for (let i = 0; i < this.files.length; i++) {
           for (let j = 0; j < this.files.length; j++) {
             if (i === j) {
-              continue;
+              continue
             }
             taskList.push({
               biddingFileId: this.files[i].fileId,
@@ -318,23 +210,140 @@ export default {
             })
           }
         }
+        console.log('createBatchDuplicate', taskList, this.metaInfo)
+        const res = await createBatchDuplicate(taskList, this.metaInfo)
+        this.$message(`队列创建成功，开始对比，生成结果需要一段时间，请耐心等待....`)
 
-        const res = await createBatchDuplicate(taskList)
-        console.log('createBatchDuplicate res', res)
-
-        setInterval(async () => {
-          const taskRes = await getCurrentTasks()
-          console.log('当前运行', taskRes.data.running.map(item => item.name).join('、'))
-          console.log('排队中', taskRes.data.queue.map(item => item.name).join('、'))
-        }, 100);
-
-        // this.isCompire = false
-        // this.handleGenerateReport()
       } catch (error) {
-        console.log(error);
+        console.log(error)
         this.isCompire = false
         this.$message.error('对比失败请打开调试控制台查看具体报错信息')
       }
+
+    },
+
+    validateFiles(files) {
+      const validTypes = [
+        'application/pdf',
+        // 'application/zip',
+        // 'application/msword',
+        // 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        // 'application/x-zip-compressed',
+        // 'application/x-rar-compressed',
+      ]
+      console.log(files)
+      const validFiles = files.filter((file) => validTypes.includes(file.type))
+      const invalidFiles = files.filter(
+        (file) => !validTypes.includes(file.type)
+      )
+      if (invalidFiles.length) {
+        alert(`仅支持 pdf 格式的文件`)
+      }
+      return validFiles
+    },
+
+    handleDrop(e) {
+      e.preventDefault()
+      // this.files.push(e.dataTransfer.files[0]);
+      const validatedFile = this.validateFiles(Array.from(e.dataTransfer.files))
+      if (validatedFile.length) {
+        this.files = [...this.files, ...validatedFile]
+      }
+
+      validatedFile.forEach((file) => {
+        this.uploadFile(file)
+      })
+    },
+
+    handleDropSkipFile(e) {
+      e.preventDefault()
+      // this.files.push(e.dataTransfer.files[0]);
+      const validatedFile = this.validateFiles(Array.from(e.dataTransfer.files))
+      if (validatedFile.length) {
+        this.skipFile = validatedFile[0]
+      }
+      if (this.skipFile) {
+        this.uploadSkipFile()
+      }
+    },
+
+    handleFile(e) {
+      // this.files.push(e.target.files[0]);
+      const validatedFile = this.validateFiles(Array.from(e.target.files))
+      if (validatedFile.length) {
+        this.files = [...this.files, ...validatedFile]
+      }
+      validatedFile.forEach((file) => {
+        this.uploadFile(file)
+      })
+    },
+    triggerFileInput() {
+      this.$refs.fileInput.click()
+    },
+    deleteFile(index) {
+      this.files.splice(index, 1)
+    },
+
+    async uploadFile(file) {
+      const formData = new FormData()
+      formData.append('file', file, encodeURIComponent(file.name))
+      file.state = '上传中'
+      this.files = [...this.files]
+      try {
+        const res = await uploadFile(formData, (percent) => {
+          console.log(file.name, percent)
+        })
+
+        file.state = '上传成功'
+        file.fileId = res.data._id
+      } catch (error) {
+        file.state = '上传失败'
+      }
+      this.files = [...this.files]
+    },
+
+    async uploadSkipFile() {
+      const formData = new FormData()
+      formData.append(
+        'file',
+        this.skipFile,
+        encodeURIComponent(this.skipFile.name)
+      )
+      this.skipFile.state = '上传中'
+      try {
+        const res = await uploadFile(formData, (percent) => {
+          console.log(this.skipFile.name, percent)
+        })
+        this.skipFile.state = '上传成功'
+        this.skipFile.fileId = res.data._id
+
+        this.skipFile = {
+          ...this.skipFile,
+          name: this.skipFile.name,
+          state: '上传成功',
+          fileId: res.data._id,
+        }
+      } catch (error) {
+        this.skipFile = {
+          ...this.skipFile,
+          name: this.skipFile.name,
+          state: '上传失败',
+        }
+      }
+    },
+
+    deleteSkipFile() {
+      this.skipFile = null
+    },
+
+    async handleCompire() {
+
+      if (this.files.length < 2) {
+        alert('请至少上传两个文件')
+        return
+      }
+
+      this.showMetaInfoModal = true
     },
 
     async handleGenerateReport() {
@@ -343,18 +352,19 @@ export default {
       // });
       // console.log("handleGenerateReport", res.data.data);
 
-      const res = await createReport(this.compireResults.map((result) => result._id));
+      const res = await createReport(
+        this.compireResults.map((result) => result._id)
+      )
 
       console.log('createReport res', res)
 
       this.$router.push({
-        path: "/report-detail",
-        query: { id: res.data._id, mode: "edit" },
-      });
+        path: '/report-detail',
+        query: { id: res.data._id, mode: 'edit' },
+      })
     },
 
     async execCompire(biddingFileId, targetFileId, skipFileId) {
-
       const requestOptions = {
         biddingFileId,
         targetFileId,
@@ -365,12 +375,12 @@ export default {
         requestOptions.skipFileId = skipFileId
       }
 
-      console.log("execCompire", requestOptions);
-      const res = await execDuplicate(requestOptions);
-      return res.data;
+      console.log('execCompire', requestOptions)
+      const res = await execDuplicate(requestOptions)
+      return res.data
     },
   },
-};
+}
 </script>
 
 <style scoped>
@@ -422,7 +432,7 @@ export default {
 
 .file-upload-tab-item.active::after {
   position: absolute;
-  content: "";
+  content: '';
   display: block;
   width: 100%;
   height: 2px;
@@ -452,7 +462,6 @@ export default {
 .file-upload-desc {
   margin-bottom: 20px;
 }
-
 
 .file-list {
   margin-bottom: 24px;
@@ -591,7 +600,7 @@ export default {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0,0,0, 0.34);
+  background: rgba(0, 0, 0, 0.34);
   color: #fff;
   border-radius: 10px;
   display: flex;

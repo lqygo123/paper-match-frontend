@@ -5,31 +5,6 @@
       <div class="header-desc"> {{ mode === 'edit' ? '编辑报告' : '查重报告结果' }}</div>
     </div>
     <div class="main-con">
-      <!-- <el-form
-        v-if="mode === 'edit'"
-        ref="form"
-        :model="metaInfo"
-      >
-        <el-form-item label="项目名称：">
-          <el-input v-model="metaInfo.projectName"></el-input>
-        </el-form-item>
-        <el-form-item label="招标编号：">
-          <el-input v-model="metaInfo.biddingNumber"></el-input>
-        </el-form-item>
-        <el-form-item label="招标人：">
-          <el-input v-model="metaInfo.biddingCompany"></el-input>
-        </el-form-item>
-        <el-form-item label="参与公司：">
-          <el-input v-model="metaInfo.participatingCompany"></el-input>
-        </el-form-item>
-        <el-form-item label="时间：">
-          <el-input v-model="metaInfo.time"></el-input>
-        </el-form-item>
-        <el-form-item label="提交时间：">
-          <el-input v-model="reportTime"></el-input>
-        </el-form-item>
-      </el-form> -->
-
       <div class="report-header">
           <div class="header-item">
             <span class="label">项目名称：</span>
