@@ -21,14 +21,17 @@
         :data-id="item.id"
       >
         <div class="res-item_title">
-          <div class="index">{{ item.index }}</div>
+          <div class="index">{{ item.index + 1 }}</div>
           <div class="content"> {{ decodeURIComponent(compireResult.targetFileName) }} 第{{ item.pdf2Page }}页 </div>
           <div class="icon"></div>
         </div>
 
         <div class="res-item_card" v-if="item.id === highlightedBlock.id">
-          <div>重复内容：</div>
-          <div>
+          <div class="res-item_card-head">重复内容：</div>
+          <div v-if="item.type === 'image'">
+            <img :src="`${domain}${item.imgSrc}`" alt="">
+          </div>
+          <div v-else>
             {{ item.text }}
           </div>
         </div>
@@ -62,6 +65,7 @@ const parseCord = (cord, height, factor) => {
 export default {
   data() {
     return {
+      domain: DOMAIN,
       mode: this.$route.query.mode,
       compireId: this.$route.query.compireId,
       factor: 1,
@@ -97,7 +101,19 @@ export default {
     this.compireResult = compireResult.data
 
     this.ocrPages = compireResult.detail.pdf1Pages || []
-    this.MockMatchRes = compireResult.detail.textRepetitions || compireResult.detail.ocrRepetitions || []
+
+    let matchReslist = compireResult.detail.textRepetitions || compireResult.detail.ocrRepetitions || []
+    if (compireResult.detail.imageRepetitions && compireResult.detail.imageRepetitions.length) {
+      matchReslist = matchReslist.concat(compireResult.detail.imageRepetitions)
+    }
+
+    matchReslist.forEach((item, index) => {
+      item.index = index
+    })
+
+    console.log('matchReslist', matchReslist)
+
+    this.MockMatchRes = matchReslist
 
     this.loadPdf(`${DOMAIN}/api/v1/file/${this.compireResult.biddingFileId}`);
   },
@@ -186,7 +202,7 @@ export default {
       canvas.isRenderHighlitBlocks = true
       const blocks = this.getHighlightBlocks(pageNum - 1);
       const container = canvas.parentNode;
-      console.log("renderHighlightBlocks blocks", pageNum, blocks, container)
+      // console.log("renderHighlightBlocks blocks", pageNum, blocks, container)
 
       blocks.forEach((block) => {
         const { pdf1coord } = block;
@@ -198,19 +214,17 @@ export default {
         div.style.position = "absolute";
         div.style.left = `${x1}px`;
 
-        console.log(y2)
         if (this.mode === 'ocr') {
           div.style.top = `${y1}px`;
         } else {
-          div.style.bottom = `${y1}px`;
+          div.style.top = `${y1}px`;
         }
         div.style.width = `${width}px`;
         div.style.height = `${height}px`;
         div.style.backgroundColor = "rgba(255, 0, 0, 0.2)";
         div.dataset.id = block.id;
-        div.dataset.index = block.index;
+        div.dataset.index = block.index + 1;
         div.dataset.blockIdx = `${block.pdf1Page}-${block.pdf1BlockIdx}`;
-        // div.innerText = block.text;
         
 
         // 为 div 添加点击事件，点击时高亮，并 log 当前的 block 信息
@@ -458,23 +472,23 @@ export default {
   cursor: pointer;
   margin: 0 16px 16px 16px;
 }
-.res-item_card div:nth-child(1) {
-  display: flex;
-  align-items: center;
-  margin-bottom: 8px;
-  font-size: 14px;
-  font-weight: 400;
-  color: #606366;
+
+.res-item_card img {
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  margin-bottom: 10px;
 }
-.res-item_card div:nth-child(2) {
-  color: #222;
-  max-height: 60px;
-  /* height: 60px; */
-  overflow-y: auto;
+
+.res-item_card-head {
+  margin-bottom: 10px;
+  font-weight: bold;
 }
+
 .res-item .index {
   height: 20px;
-  width: 20px;
+  /* width: 20px; */
   line-height: 20px;
   text-align: center;
   background: #007bff;
@@ -482,6 +496,7 @@ export default {
   color: #fff;
   /* margin-bottom: 10px; */
   display: inline-block;
+  padding: 0 4px;
   /* border: 1px solid #999; */
   /* padding: 5px; */
 }

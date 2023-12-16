@@ -8,6 +8,7 @@ import ReportList from './pages/ReportList.vue';
 import ElementUI from 'element-ui';
 import login from './pages/login.vue';
 import userAdmin from './pages/userAdmin.vue';
+import TaskList from './pages/TaskList.vue';
 import 'element-ui/lib/theme-chalk/index.css';
 
 export const store = Vue.observable({
@@ -26,6 +27,7 @@ const routes = [
   { path: '/', redirect: '/login', name: 'login' },
   { path: '/login', component: login, name: 'login' },
   { path: '/user-admin', component: userAdmin, name: 'userAdmin' },
+  { path: '/task-list', component: TaskList },
   { path: '/pdf-preview', component: PDFPreview },
   { path: '/report-list', component: ReportList },
   { path: '/file-upload', component: FileUpload },

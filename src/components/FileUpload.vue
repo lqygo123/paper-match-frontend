@@ -36,10 +36,6 @@
       </span>
     </el-dialog>
 
-    <div class="compire-loading" v-if="isCompire">
-      结果对比中，请耐心等待...
-    </div>
-
     <div id="mode-switch" class="file-upload-tab">
       <div
         class="file-upload-tab-item"
@@ -132,13 +128,25 @@
         </div>
       </div>
 
+      <div v-if="mode === 'digital'" class="file-upload-header">查重设置</div>
+      <div v-if="mode === 'digital'" class="extra-setting">
+        <el-tooltip content="是否开启对比文档中的图片对比，开启图片对比会显著降低查重运行速度" placement="top">
+          <el-switch
+            v-model="enableImageCompare"
+            active-color="#13ce66"
+            active-value="100"
+            inactive-value="0">
+          </el-switch>
+        </el-tooltip>
+        对比图片
+      </div>
+
       <input
         type="file"
         @change="handleFile"
         ref="fileInput"
         style="display: none"
       />
-      <!-- <button @click="triggerFileInput">选择文件</button> -->
     </div>
 
     <div class="buttons-wrap">
@@ -166,6 +174,7 @@ export default {
       compireResults: [],
       isCompire: false,
       showMetaInfoModal: false,
+      enableImageCompare: false,
       metaInfo: {
         projectName: '',
         biddingNumber: '',
@@ -186,11 +195,6 @@ export default {
   methods: {
     async handleMetaInfoModalConfirm() {
       this.showMetaInfoModal = false
-
-      // this.isCompire = true;
-      // this.$message(`开始对比，生成结果需要一段时间，请耐心等待....`)
-
-      // const fileIds = this.files.map((file) => file.fileId);
 
       const taskList = []
 
@@ -213,6 +217,9 @@ export default {
         console.log('createBatchDuplicate', taskList, this.metaInfo)
         const res = await createBatchDuplicate(taskList, this.metaInfo)
         this.$message(`队列创建成功，开始对比，生成结果需要一段时间，请耐心等待....`)
+        this.$router.push({
+          path: '/task-list',
+        })
 
       } catch (error) {
         console.log(error)
@@ -466,6 +473,16 @@ export default {
 .file-list {
   margin-bottom: 24px;
 }
+
+.extra-setting {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.extra-setting .el-switch {
+  margin-right: 20px;
+} 
 
 .file-list .file-item {
   display: flex;

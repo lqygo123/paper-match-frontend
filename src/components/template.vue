@@ -1,25 +1,22 @@
 <template>
-  <div id="main-page">
-
+  <div class="task-list-page">
+    <div class="task-list-header">比对中任务</div>
+    
   </div>
 </template>
 
 <script>
-// import HelloWorld from './components/HelloWorld.vue';
 
 export default {
-  name: 'FileUpload',
-  components: {
-    // HelloWorld,
-  },
+  name: 'TaskList',
+  components: {},
   data() {
     return {
       aaa: 123
     };
   },
   mounted() {
-    // this.loadPdf("http://localhost:3000/static/gpt-4.pdf");
-    this.loadPdf("http://localhost:3000/static/gpt-5.pdf");
+
   },
   methods: {
     aa() {
@@ -30,12 +27,37 @@ export default {
 </script>
 
 <style>
-#main-page {
-  height: 100%;
+.task-list-page {
+  background: #fff;
+  border-radius: 8px;
+  padding-top: 45px;
+  margin: 24px;
+  height: calc(100% - 48px);
+  position: relative;
+}
+
+.task-list-header {
+  height: 45px;
   width: 100%;
+  border-bottom: 1px solid #e6e6e6;
   position: absolute;
-  top: 0;
   left: 0;
-  box-sizing: border-box;
+  top: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.task-list-bottom {
+  height: 45px;
+  width: 100%;
+  border-top: 1px solid #e6e6e6;
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 </style>

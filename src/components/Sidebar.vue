@@ -12,6 +12,11 @@
           <span>标书查重 </span>
         </template>
       </el-menu-item>
+      <!-- TaskList 查重进度 -->
+      <el-menu-item index="/task-list">
+        <i class="el-icon-s-data"></i>
+        <span>查重进度</span>
+      </el-menu-item>
       <el-menu-item index="/report-list">
         <i class="el-icon-tickets"></i>
         <span>查看报告</span>
