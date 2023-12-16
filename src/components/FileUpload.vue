@@ -117,18 +117,7 @@
         </div>
       </div>
 
-      <div v-if="files.length" class="file-list">
-        <div class="file-item" v-for="(file, index) in files" :key="index">
-          <div class="file-content">投标文件</div>
-          <div class="file-name">{{ file.name }}</div>
-          <div class="file-content">{{ file.state }}</div>
-          <div class="file-content">
-            <el-button @click="deleteFile(index)">删除</el-button>
-          </div>
-        </div>
-      </div>
-
-      <div v-if="mode === 'digital'" class="file-upload-header">查重设置</div>
+      <!-- <div v-if="mode === 'digital'" class="file-upload-header">查重设置</div> -->
       <div v-if="mode === 'digital'" class="extra-setting">
         <el-tooltip content="是否开启对比文档中的图片对比，开启图片对比会显著降低查重运行速度" placement="top">
           <el-switch
@@ -140,6 +129,19 @@
         </el-tooltip>
         对比图片
       </div>
+
+      <div v-if="files.length" class="file-list">
+        <div class="file-item" v-for="(file, index) in files" :key="index">
+          <div class="file-content">投标文件</div>
+          <div class="file-name">{{ file.name }}</div>
+          <div class="file-content">{{ file.state }}</div>
+          <div class="file-content">
+            <el-button @click="deleteFile(index)">删除</el-button>
+          </div>
+        </div>
+      </div>
+
+
 
       <input
         type="file"
@@ -478,6 +480,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: flex-start;
+  margin-bottom: 20px;
 }
 
 .extra-setting .el-switch {

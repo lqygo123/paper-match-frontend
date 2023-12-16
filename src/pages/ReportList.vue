@@ -10,7 +10,7 @@
         </el-form-item>
         <el-form-item label="招标编号：">
           <el-input
-            v-model="filters.biddingID"
+            v-model="filters.biddingNumber"
             placeholder="请输入招标编号"
           ></el-input>
         </el-form-item>
@@ -20,16 +20,10 @@
             placeholder="请输入招标单位"
           ></el-input>
         </el-form-item>
-        <el-form-item label="招标代理：">
+        <el-form-item label="参与公司：">
           <el-input
-            v-model="filters.biddingAgent"
-            placeholder="请输入招标代理"
-          ></el-input>
-        </el-form-item>
-        <el-form-item label="参与单位：">
-          <el-input
-            v-model="filters.participateCompany"
-            placeholder="请输入参与单位"
+            v-model="filters.participatingCompany"
+            placeholder="请输入参与公司"
           ></el-input>
         </el-form-item>
         <el-form-item label="选择时间：">
@@ -119,9 +113,9 @@ export default {
       reports: [],
       filters: {
         projectName: "",
-        biddingID: "",
+        biddingNumber: "",
         biddingCompany: "",
-        biddingAgent: "",
+        participatingCompany: "",
         participateCompany: "",
         startTime: "",
         endTime: "",
@@ -135,8 +129,8 @@ export default {
 
   methods: {
     changeDate() {
-      this.filters.startTime = this.value1[0];
-      this.filters.endTime = this.value1[1];
+      this.filters.startTime =  this.value1 && this.value1[0] ;
+      this.filters.endTime = this.value1 && this.value1[1];
     },
     goDetail(row) {
       this.$router.push({ path: "/report-detail", query: { id: row._id } });
