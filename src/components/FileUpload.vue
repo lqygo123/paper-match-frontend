@@ -394,16 +394,16 @@ export default {
   /* padding: 0 24px; */
   /* box-sizing: content-box; */
   margin: 24px;
-  height: calc(100vh - 100px);
+  height: calc(100% - 48px);
   color: #666666;
 
-  display: flex;
+  /* display: flex;
   align-items: center;
   justify-content: space-between;
-  flex-direction: column;
+  flex-direction: column; */
   position: relative;
   /* width: 100%; */
-  box-sizing: border-box;
+  /* box-sizing: border-box; */
 }
 
 .file-upload-tab {
@@ -447,11 +447,9 @@ export default {
 
 #file-upload .main-content {
   padding: 24px 24px;
-  margin: 0 24px;
   flex-grow: 1;
   overflow-y: auto;
-  box-sizing: content-box;
-  width: calc(100% - 48px);
+  height: calc(100% - 105px);
 }
 
 .file-upload-header {
@@ -569,6 +567,8 @@ export default {
 }
 
 .buttons-wrap {
+  position: absolute;
+  bottom: 0;
   width: 100%;
   display: flex;
   align-items: center;

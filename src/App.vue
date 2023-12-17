@@ -56,6 +56,8 @@ export default {
   align-items: center;
   justify-content: space-between;
   overflow: hidden;
+
+  word-break: break-all;
 }
 .main-con {
   flex: 1;

@@ -206,6 +206,7 @@ export default {
 
       blocks.forEach((block) => {
         const { pdf1coord } = block;
+        if (!pdf1coord) return;
         let [x1, y1, x2, y2] = parseCord(pdf1coord, container.clientHeight, this.factor);
         const width = x2 - x1;
         const height = y2 - y1;
