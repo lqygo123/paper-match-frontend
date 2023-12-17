@@ -74,10 +74,9 @@
           </div>
         </div>
         <div class="unUploaded-container">
-          <div class="select-file-text left-select">拖放招标文件到这里</div>
+          <div class="select-file-text left-select">点击或拖放招标文件到这里</div>
           <div class="file-restriction">
             格式支持：单份 50M 以内 pdf 扫描件文档进行比对
-            页数文档：电子文档 500 页，扫描件 300 页
           </div>
         </div>
       </div>
@@ -111,10 +110,9 @@
           </div>
         </div>
         <div class="unUploaded-container">
-          <div class="select-file-text left-select">拖放投标文件到这里</div>
+          <div class="select-file-text left-select">点击或拖放投标文件到这里</div>
           <div class="file-restriction">
             格式支持：单份 50M 以内 pdf 扫描件文档进行比对
-            页数文档：电子文档 500 页，扫描件 300 页
           </div>
         </div>
       </div>

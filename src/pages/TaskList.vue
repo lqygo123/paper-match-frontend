@@ -4,9 +4,9 @@
     <div class="task-list">
       <div class="task-list-item bold" v-if="groupedList.length">
         <div class="task-list-item-name">项目名称</div>
-        <div class="task-list-item-creator">创建者</div>
-        <div class="task-list-item-process">比对状态</div>
-        <div class="task-list-item-time">上传时间</div>
+        <div class="task-list-item">创建者</div>
+        <div class="task-list-item">比对状态</div>
+        <div class="task-list-item">上传时间</div>
       </div>
       <div class="no-task" v-else>
         暂无任务
@@ -14,9 +14,9 @@
 
       <div class="task-list-item" v-for="batchItem in groupedList" :key="batchItem.batchId + Math.random()">
         <div class="task-list-item-name">{{ batchItem.projectName }}</div>
-        <div class="task-list-item-creator">{{ batchItem.creator.role === 'admin' ? '管理员' : batchItem.creator.name || '-' }}</div>
-        <div class="task-list-item-process">{{ batchItem.total - batchItem.waitting - batchItem.running }}/{{ batchItem.total }}</div>
-        <div class="task-list-item-time">{{ batchItem.createAt }}</div>
+        <div class="task-list-item">{{ batchItem.creator.role === 'admin' ? '管理员' : batchItem.creator.name || '-' }}</div>
+        <div class="task-list-item">{{ batchItem.total - batchItem.waitting - batchItem.running }}/{{ batchItem.total }}</div>
+        <div class="task-list-item">{{ batchItem.createAt }}</div>
       </div>
 
       <!-- <div class="task-list-item" v-for="task in runningTaskList" :key="task.id">
@@ -84,87 +84,87 @@ export default {
     };
   },
   created() {
-    this.getTaskList();
-    this.updateListIntervalId = setInterval(() => {
-      this.getTaskList();
-    }, 1000);
+    // this.getTaskList();
+    // this.updateListIntervalId = setInterval(() => {
+    //   this.getTaskList();
+    // }, 1000);
 
-    // this.groupedList = [
-    //   {
-    //     projectName: '项目1',
-    //     biddingNumber: '123',
-    //     biddingCompany: '123',
-    //     participatingCompany: '123',
-    //     time: '123',
-    //     createAt: formateTime(1702740559836),
-    //     total: 12,
-    //     waitting: 10,
-    //     running: 1,
-    //     creator: {
-    //       role: 'admin',
-    //     },
-    //     batchId: 'batch-1702740559836fwadrdna2wi',
-    //   },
-    //   {
-    //     projectName: '项目2',
-    //     biddingNumber: '123',
-    //     biddingCompany: '123',
-    //     participatingCompany: '123',
-    //     time: '123',
-    //     createAt: formateTime(1702740559836),
-    //     total: 12,
-    //     waitting: 10,
-    //     running: 1,
-    //     creator: {
-    //       role: 'admin',
-    //     },
-    //     batchId: 'batch-1702740559836fwadrdna2wi',
-    //   },
-    //   {
-    //     projectName: '项目3',
-    //     biddingNumber: '123',
-    //     biddingCompany: '123',
-    //     participatingCompany: '123',
-    //     time: '123',
-    //     createAt: formateTime(1702740559836),
-    //     total: 12,
-    //     waitting: 10,
-    //     running: 1,
-    //     creator: {
-    //       role: 'admin',
-    //     },
-    //     batchId: 'batch-1702740559836fwadrdna2wi',
-    //   },
-    //   {
-    //     projectName: '项目4',
-    //     biddingNumber: '123',
-    //     biddingCompany: '123',
-    //     participatingCompany: '123',
-    //     time: '123',
-    //     createAt: formateTime(1702740559836),
-    //     total: 12,
-    //     waitting: 10,
-    //     running: 1,
-    //     creator: {
-    //       role: 'admin',
-    //     },
-    //     batchId: 'batch-1702740559836fwadrdna2wi',
-    //   },
-    //   {
-    //     projectName: '项目5',
-    //     biddingNumber: '123',
-    //     biddingCompany: '123',
-    //     participatingCompany: '123',
-    //     time: '123',
-    //     createAt: formateTime(1702740559836),
-    //     total: 12,
-    //     waitting: 10,
-    //     running: 1,
-    //     creator: {
-    //       role: 'admin',
-    //     },
-    //     batchId: 'batch-1702740559836fwadrdna2wi',
-    //   }]
+    this.groupedList = [
+      {
+        projectName: '项目1',
+        biddingNumber: '123',
+        biddingCompany: '123',
+        participatingCompany: '123',
+        time: '123',
+        createAt: formateTime(1702740559836),
+        total: 12,
+        waitting: 10,
+        running: 1,
+        creator: {
+          role: 'admin',
+        },
+        batchId: 'batch-1702740559836fwadrdna2wi',
+      },
+      {
+        projectName: '项目2',
+        biddingNumber: '123',
+        biddingCompany: '123',
+        participatingCompany: '123',
+        time: '123',
+        createAt: formateTime(1702740559836),
+        total: 12,
+        waitting: 10,
+        running: 1,
+        creator: {
+          role: 'admin',
+        },
+        batchId: 'batch-1702740559836fwadrdna2wi',
+      },
+      {
+        projectName: '项目3',
+        biddingNumber: '123',
+        biddingCompany: '123',
+        participatingCompany: '123',
+        time: '123',
+        createAt: formateTime(1702740559836),
+        total: 12,
+        waitting: 10,
+        running: 1,
+        creator: {
+          role: 'admin',
+        },
+        batchId: 'batch-1702740559836fwadrdna2wi',
+      },
+      {
+        projectName: '项目4',
+        biddingNumber: '123',
+        biddingCompany: '123',
+        participatingCompany: '123',
+        time: '123',
+        createAt: formateTime(1702740559836),
+        total: 12,
+        waitting: 10,
+        running: 1,
+        creator: {
+          role: 'admin',
+        },
+        batchId: 'batch-1702740559836fwadrdna2wi',
+      },
+      {
+        projectName: '项目5',
+        biddingNumber: '123',
+        biddingCompany: '123',
+        participatingCompany: '123',
+        time: '123',
+        createAt: formateTime(1702740559836),
+        total: 12,
+        waitting: 10,
+        running: 1,
+        creator: {
+          role: 'admin',
+        },
+        batchId: 'batch-1702740559836fwadrdna2wi',
+      }]
   },
   destroyed() {
     clearInterval(this.updateListIntervalId);
@@ -235,6 +235,7 @@ export default {
   position: absolute;
   left: 0;
   top: 0;
+  font-weight: bold;
 
   display: flex;
   align-items: center;
@@ -254,7 +255,7 @@ export default {
 .task-list-item {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: space-around;
   height: 40px;
   margin-bottom: 10px;
 }
@@ -264,31 +265,48 @@ export default {
 }
 
 .task-list-item-name {
-  flex-basis: 400px;
-  flex-shrink: 0;
-  flex-grow: 1;
   text-align: center;
+  flex-grow: 1;
   overflow: hidden;
   text-overflow:ellipsis;
   white-space: nowrap;
 }
 
-.task-list-item-creator {
-  flex-basis: 100px;
+.task-list-item {
+  flex-grow: 0;
   flex-shrink: 0;
-  text-align: center;
+  flex-basis: 20%;
+  overflow: hidden;
+  text-overflow:ellipsis;
+  white-space: nowrap;
+
 }
 
-.task-list-item-process {
-  flex-basis: 100px;
+/* .task-list-item-creator {
+  flex-basis: 30%;
   flex-shrink: 0;
   text-align: center;
-}
+  overflow: hidden;
+  text-overflow:ellipsis;
+  white-space: nowrap;
+} */
+
+/* .task-list-item-process {
+  flex-basis: 30%;
+  flex-shrink: 0;
+  text-align: center;
+  overflow: hidden;
+  text-overflow:ellipsis;
+  white-space: nowrap;
+} */
 
 .task-list-item-state {
-  flex-basis: 60px;
+  flex-basis: 20%;
   flex-shrink: 0;
   text-align: center;
+  overflow: hidden;
+  text-overflow:ellipsis;
+  white-space: nowrap;
 }
 .task-list-item-state.green {
   color: #52c41a;

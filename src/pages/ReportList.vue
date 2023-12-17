@@ -175,6 +175,10 @@ export default {
   top: 0;
   left: 0;
 }
+
+#main-page .el-date-editor .el-range-separator {
+  box-sizing: content-box;
+}
 .report-item {
   display: flex;
   align-items: center;
