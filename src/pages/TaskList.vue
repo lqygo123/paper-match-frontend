@@ -84,87 +84,87 @@ export default {
     };
   },
   created() {
-    // this.getTaskList();
-    // this.updateListIntervalId = setInterval(() => {
-    //   this.getTaskList();
-    // }, 1000);
+    this.getTaskList();
+    this.updateListIntervalId = setInterval(() => {
+      this.getTaskList();
+    }, 1000);
 
-    this.groupedList = [
-      {
-        projectName: '项目1',
-        biddingNumber: '123',
-        biddingCompany: '123',
-        participatingCompany: '123',
-        time: '123',
-        createAt: formateTime(1702740559836),
-        total: 12,
-        waitting: 10,
-        running: 1,
-        creator: {
-          role: 'admin',
-        },
-        batchId: 'batch-1702740559836fwadrdna2wi',
-      },
-      {
-        projectName: '项目2',
-        biddingNumber: '123',
-        biddingCompany: '123',
-        participatingCompany: '123',
-        time: '123',
-        createAt: formateTime(1702740559836),
-        total: 12,
-        waitting: 10,
-        running: 1,
-        creator: {
-          role: 'admin',
-        },
-        batchId: 'batch-1702740559836fwadrdna2wi',
-      },
-      {
-        projectName: '项目3',
-        biddingNumber: '123',
-        biddingCompany: '123',
-        participatingCompany: '123',
-        time: '123',
-        createAt: formateTime(1702740559836),
-        total: 12,
-        waitting: 10,
-        running: 1,
-        creator: {
-          role: 'admin',
-        },
-        batchId: 'batch-1702740559836fwadrdna2wi',
-      },
-      {
-        projectName: '项目4',
-        biddingNumber: '123',
-        biddingCompany: '123',
-        participatingCompany: '123',
-        time: '123',
-        createAt: formateTime(1702740559836),
-        total: 12,
-        waitting: 10,
-        running: 1,
-        creator: {
-          role: 'admin',
-        },
-        batchId: 'batch-1702740559836fwadrdna2wi',
-      },
-      {
-        projectName: '项目5',
-        biddingNumber: '123',
-        biddingCompany: '123',
-        participatingCompany: '123',
-        time: '123',
-        createAt: formateTime(1702740559836),
-        total: 12,
-        waitting: 10,
-        running: 1,
-        creator: {
-          role: 'admin',
-        },
-        batchId: 'batch-1702740559836fwadrdna2wi',
-      }]
+    // this.groupedList = [
+    //   {
+    //     projectName: '项目1',
+    //     biddingNumber: '123',
+    //     biddingCompany: '123',
+    //     participatingCompany: '123',
+    //     time: '123',
+    //     createAt: formateTime(1702740559836),
+    //     total: 12,
+    //     waitting: 10,
+    //     running: 1,
+    //     creator: {
+    //       role: 'admin',
+    //     },
+    //     batchId: 'batch-1702740559836fwadrdna2wi',
+    //   },
+    //   {
+    //     projectName: '项目2',
+    //     biddingNumber: '123',
+    //     biddingCompany: '123',
+    //     participatingCompany: '123',
+    //     time: '123',
+    //     createAt: formateTime(1702740559836),
+    //     total: 12,
+    //     waitting: 10,
+    //     running: 1,
+    //     creator: {
+    //       role: 'admin',
+    //     },
+    //     batchId: 'batch-1702740559836fwadrdna2wi',
+    //   },
+    //   {
+    //     projectName: '项目3',
+    //     biddingNumber: '123',
+    //     biddingCompany: '123',
+    //     participatingCompany: '123',
+    //     time: '123',
+    //     createAt: formateTime(1702740559836),
+    //     total: 12,
+    //     waitting: 10,
+    //     running: 1,
+    //     creator: {
+    //       role: 'admin',
+    //     },
+    //     batchId: 'batch-1702740559836fwadrdna2wi',
+    //   },
+    //   {
+    //     projectName: '项目4',
+    //     biddingNumber: '123',
+    //     biddingCompany: '123',
+    //     participatingCompany: '123',
+    //     time: '123',
+    //     createAt: formateTime(1702740559836),
+    //     total: 12,
+    //     waitting: 10,
+    //     running: 1,
+    //     creator: {
+    //       role: 'admin',
+    //     },
+    //     batchId: 'batch-1702740559836fwadrdna2wi',
+    //   },
+    //   {
+    //     projectName: '项目5',
+    //     biddingNumber: '123',
+    //     biddingCompany: '123',
+    //     participatingCompany: '123',
+    //     time: '123',
+    //     createAt: formateTime(1702740559836),
+    //     total: 12,
+    //     waitting: 10,
+    //     running: 1,
+    //     creator: {
+    //       role: 'admin',
+    //     },
+    //     batchId: 'batch-1702740559836fwadrdna2wi',
+    //   }]
   },
   destroyed() {
     clearInterval(this.updateListIntervalId);
