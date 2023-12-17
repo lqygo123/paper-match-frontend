@@ -63,6 +63,7 @@
         @drop="handleDropSkipFile"
         @dragover.prevent
         @dragenter.prevent
+        @click="triggerSkipFileInput"
       >
         <div class="upload-box left-box">
           <div class="origin-file preview-div">
@@ -99,6 +100,7 @@
         @drop="handleDrop"
         @dragover.prevent
         @dragenter.prevent
+        @click="triggerFileInput"
       >
         <div class="upload-box left-box">
           <div class="origin-file preview-div">
@@ -141,12 +143,18 @@
         </div>
       </div>
 
-
-
       <input
         type="file"
         @change="handleFile"
         ref="fileInput"
+        style="display: none"
+        multiple
+      />
+
+      <input
+        type="file"
+        @change="handleSkipFile"
+        ref="skipfileInput"
         style="display: none"
       />
     </div>
@@ -286,8 +294,22 @@ export default {
         this.uploadFile(file)
       })
     },
+
+    handleSkipFile(e) {
+      // this.files.push(e.target.files[0]);
+      const validatedFile = this.validateFiles(Array.from(e.target.files))
+      if (validatedFile.length) {
+        this.skipFile = validatedFile[0]
+      }
+      if (this.skipFile) {
+        this.uploadSkipFile()
+      }
+    },
     triggerFileInput() {
       this.$refs.fileInput.click()
+    },
+    triggerSkipFileInput() {
+      this.$refs.skipfileInput.click()
     },
     deleteFile(index) {
       this.files.splice(index, 1)
