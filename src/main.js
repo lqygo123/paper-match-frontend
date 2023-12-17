@@ -48,8 +48,10 @@ const router = new VueRouter({
   routes // short for `routes: routes`
 });
 
-new Vue({
+const vue = new Vue({
   router,
   render: h => h(App),
 }).$mount('#app');
+console.log(vue);
+window.vueInstance = vue
 

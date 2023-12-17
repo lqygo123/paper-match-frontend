@@ -40,6 +40,7 @@ async function authedRequest(request) {
       // 未登录，跳转到登录页 vue route to 
       window.location.href = '#/login';
       logout()
+      window.vueInstance.$message.error('登录信息已过期，请重新登录');
     }
     // throw error;
   }
