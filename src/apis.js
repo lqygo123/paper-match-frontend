@@ -13,6 +13,7 @@ const setLoginInfo = (userInfo) => {
   store.username = userInfo.username;
   store.role = userInfo.role;
   store.token = userInfo.token;
+  localStorage.setItem('loginInfo', JSON.stringify(userInfo));
 }
 
 const logout = () => {
@@ -20,6 +21,7 @@ const logout = () => {
   store.username = '';
   store.role = '';
   store.token = '';
+  localStorage.removeItem('loginInfo')
 }
 
 async function authedRequest(request) {

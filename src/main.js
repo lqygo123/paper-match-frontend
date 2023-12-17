@@ -16,7 +16,17 @@ export const store = Vue.observable({
   username: '',
   token: '',
   role: '',
+  name: ''
 });
+
+if (localStorage.getItem('loginInfo')) {
+  const loginInfo = JSON.parse(localStorage.getItem('loginInfo'));
+  store.isLoggedIn = true;
+  store.username = loginInfo.username;
+  store.role = loginInfo.role;
+  store.token = loginInfo.token;
+  store.name = loginInfo.name;
+}
 
 Vue.use(VueRouter);
 Vue.use(ElementUI);
