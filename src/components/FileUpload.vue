@@ -123,7 +123,7 @@
           <el-switch
             v-model="enableImageCompare"
             active-color="#13ce66"
-            active-value="100"
+            active-value="1"
             inactive-value="0">
           </el-switch>
         </el-tooltip>
@@ -218,7 +218,7 @@ export default {
               skipFileId: this.skipFile && this.skipFile.fileId,
               biddingFileName: this.files[i].name,
               targetFileName: this.files[j].name,
-              enableImageCompare: this.enableImageCompare,
+              enableImageCompare: this.enableImageCompare === '1',
               mode: this.mode,
             })
           }
