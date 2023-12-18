@@ -218,6 +218,7 @@ export default {
               skipFileId: this.skipFile && this.skipFile.fileId,
               biddingFileName: this.files[i].name,
               targetFileName: this.files[j].name,
+              enableImageCompare: this.enableImageCompare,
               mode: this.mode,
             })
           }
@@ -392,6 +393,7 @@ export default {
       const requestOptions = {
         biddingFileId,
         targetFileId,
+        enableImageCompare: this.enableImageCompare,
         mode: this.mode,
       }
 
