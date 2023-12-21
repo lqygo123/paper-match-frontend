@@ -2,7 +2,8 @@
 <template>
   <div class="flex">
     <!-- <div class="wrap"> -->
-    <div class="pdfContainer" :class="mode" id="pdfContainer" ref="pdfContainer"></div>
+    <div class="pdfContainer" id="pdfContainer" ref="pdfContainer"></div>
+    <div class="pdfContainer" v-if="showPdf2" id="pdf2Container" ref="pdf2Container"></div>
 
     <div class="res-list" id="right" :style="'width:' + leftWidth + 'px'">
       <!-- <div class="line" v-drag></div> -->
@@ -39,6 +40,7 @@
     </div>
 
     <el-button class="export-btn" @click="handleExportPdf" type="primary">导出</el-button>
+    <el-button class="compare-btn" @click="handleShowPdf2" type="primary">{{ showPdf2 ? '关闭对比文件' : '显示对比文件' }}</el-button>
   </div>
 </template>
 
@@ -62,6 +64,8 @@ const parseCord = (cord, height, factor) => {
   }
 };
 
+let pdfDocument2
+
 export default {
   data() {
     return {
@@ -74,11 +78,18 @@ export default {
       rendedPages: {},
       MockMatchRes: [],
       ocrPages: [],
-      pdf1TextTotal: 0,
+
       textRepetitionCount: 0,
       compireResult: {
         abstract: {}
       },
+
+      showPdf2: false,
+      ifPdf2Loaded: false,
+      pdf2HightedBlock: {},
+      pdf2HightlightBlocks: [],
+      pdf2RendedPages: {},
+      pdf2ocrPages: []
     };
   },
   async mounted() {
@@ -101,6 +112,7 @@ export default {
     this.compireResult = compireResult.data
 
     this.ocrPages = compireResult.detail.pdf1Pages || []
+    this.pdf2ocrPages = compireResult.detail.pdf2Pages || []
 
     let matchReslist = compireResult.detail.textRepetitions || compireResult.detail.ocrRepetitions || []
     if (compireResult.detail.imageRepetitions && compireResult.detail.imageRepetitions.length) {
@@ -160,6 +172,161 @@ export default {
       );
       const canvases = this.$refs.pdfContainer.querySelectorAll("canvas");
       canvases.forEach((canvas) => observer.observe(canvas));
+    },
+
+
+
+    async loadPdf2(url) {
+
+      let numPages
+
+      if (this.mode === 'ocr') {
+        numPages = this.pdf2ocrPages.length;
+        await new Promise((resolve, reject) => {
+          setTimeout(() => {
+            resolve()
+          }, 100);
+        })
+      } else {
+        pdfDocument2 = await pdfjsLib.getDocument(url).promise;
+        numPages = pdfDocument2.numPages;
+      }
+
+      for (let pageNum = 1; pageNum <= numPages; pageNum++) {
+        const canvasContainer = document.createElement("div");
+        canvasContainer.className = "pdf-page";
+        canvasContainer.dataset.pageNum = pageNum;
+        const canvas = document.createElement("canvas");
+        canvas.dataset.pageNum = pageNum;
+        this.$refs.pdf2Container.appendChild(canvasContainer);
+        canvasContainer.appendChild(canvas);
+      }
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.intersectionRatio > 0.3) {
+              this.renderPage2(
+                parseInt(entry.target.dataset.pageNum),
+                entry.target
+              );
+              this.renderHighlightBlocks2(
+                parseInt(entry.target.dataset.pageNum),
+                entry.target
+              );
+            }
+          });
+        },
+        { threshold: 0.3 }
+      );
+
+      const canvases = this.$refs.pdf2Container.querySelectorAll("canvas");
+      canvases.forEach((canvas) => observer.observe(canvas));
+
+    },
+
+    async renderPage2(pageNum, canvas) {
+      if (canvas.isRendered || !canvas) return;
+      canvas.isRendered = true;
+      if (this.mode === 'ocr') {
+        const page = this.pdf2ocrPages[pageNum - 1];
+
+        const viewport = {
+          width: page.width * this.factor,
+          height: page.height * this.factor,
+        };
+        const context = canvas.getContext("2d");
+        canvas.height = viewport.height ;
+        canvas.width = viewport.width ;
+        // drawImage from base64Data in page.data
+        const img = new Image();
+        // 组装 dataurl
+        // img.src = `http://localhost:3000/output_scan_pdf1/pdf1-${pageNum - 1}.png`;
+        img.src = `${DOMAIN}${page.src}`;
+        img.onload = function () {
+          context.drawImage(img, 0, 0, viewport.width, viewport.height);
+        };
+      } else {
+        const page = await pdfDocument2.getPage(pageNum);
+        const viewport = page.getViewport({ scale: 1 });
+        const context = canvas.getContext("2d");
+        canvas.height = viewport.height;
+        canvas.width = viewport.width;
+        page.render({ canvasContext: context, viewport }).promise;
+      }
+    },
+
+    getHighlightBlocks2(pageNum) {
+      const blocks = this.MockMatchRes.filter(
+        (item) => item.pdf2Page === pageNum
+      );
+      // return blocks;
+
+      // 对于 blocks 中 pdf1CoordStr 相同的，进行去重
+      const pdf1coordMap = {};
+      blocks.forEach((block) => {
+        const key = `${block.pdf2Page}-${block.pdf2BlockIdx}`
+        if (!pdf1coordMap[key]) {
+          pdf1coordMap[key] = block;
+        }
+      });
+      return Object.values(pdf1coordMap);
+    },
+
+    renderHighlightBlocks2(pageNum, canvas) {
+      if (canvas.isRenderHighlitBlocks) return;
+      canvas.isRenderHighlitBlocks = true
+      const blocks = this.getHighlightBlocks2(pageNum - 1);
+
+
+      const container = canvas.parentNode;
+      console.log("renderHighlightBlocks2 blocks", pageNum, blocks, container)
+
+      blocks.forEach((block) => {
+        const { pdf2coord } = block;
+        if (!pdf2coord) return;
+        let [x1, y1, x2, y2] = parseCord(pdf2coord, container.clientHeight, this.factor);
+        const width = x2 - x1;
+        const height = y2 - y1;
+        const div = document.createElement("div");
+        div.className = "highlight-block";
+        div.style.position = "absolute";
+        div.style.left = `${x1}px`;
+
+        if (this.mode === 'ocr') {
+          div.style.top = `${y1}px`;
+        } else {
+          div.style.top = `${y1}px`;
+        }
+        div.style.width = `${width}px`;
+        div.style.height = `${height}px`;
+        div.style.backgroundColor = "rgba(255, 0, 0, 0.2)";
+        div.dataset.id = block.id;
+        div.dataset.index = block.index + 1;
+        div.dataset.blockIdx = `${block.type}-${block.pdf2Page}-${block.pdf2BlockIdx}`;
+        
+        // 为 div 添加点击事件，点击时高亮，并 log 当前的 block 信息
+        div.addEventListener("click", async () => {
+          console.log("hight block click", block.id);
+          console.log("hight block click", JSON.stringify(block));
+          this.handleResItemClick(block);
+
+          // res-item scroll into view
+          const resItemDom = window.document.querySelector(
+            `.res-list > [data-id="${block.id}"]`
+          );
+          resItemDom.scrollIntoView(true);
+        });
+
+        console.log("renderHighlightBlocks2 div", div)
+
+        container.appendChild(div);
+      });
+    },
+
+    handleShowPdf2() {
+      this.showPdf2 = !this.showPdf2
+      this.loadPdf2(`${DOMAIN}/api/v1/file/${this.compireResult.targetFileId}`);
     },
 
     async setCanvasSize(pageNum, canvas) {
@@ -225,7 +392,7 @@ export default {
         div.style.backgroundColor = "rgba(255, 0, 0, 0.2)";
         div.dataset.id = block.id;
         div.dataset.index = block.index + 1;
-        div.dataset.blockIdx = `${block.pdf1Page}-${block.pdf1BlockIdx}`;
+        div.dataset.blockIdx = `${block.type}-${block.pdf1Page}-${block.pdf1BlockIdx}`;
         
 
         // 为 div 添加点击事件，点击时高亮，并 log 当前的 block 信息
@@ -276,12 +443,18 @@ export default {
       }
     },
 
-    scrollToTargetPage(index) {
-      console.log("scrollToTargetPage", index);
-      const pageDom = window.document.querySelector(
-        `.pdfContainer > :nth-child(${index + 1})`
+    scrollToTargetPage(index1, index2) {
+      console.log("scrollToTargetPage", index1, index2);
+      const pageDom = this.$refs.pdfContainer.querySelector(
+        `.pdfContainer > :nth-child(${index1 + 1})`
       );
       pageDom.scrollIntoView(true);
+
+      if (!this.showPdf2) return
+      const pageDom2 = this.$refs.pdf2Container.querySelector(
+        `.pdfContainer > :nth-child(${index2 + 1})`
+      );
+      pageDom2 && pageDom2.scrollIntoView(true);
     },
 
     onScroll(pageNum) {
@@ -298,21 +471,35 @@ export default {
       console.log("handleResItemClick", item);
       const execHighlightBlock = () => {
         if (this.highlightedBlock) {
-          const oldHighlightBlock = window.document.querySelector(
-            `.highlight-block[data-block-idx="${this.highlightedBlock.pdf1Page}-${this.highlightedBlock.pdf1BlockIdx}"]`
+          const oldHighlightBlock = this.$refs.pdfContainer.querySelector(
+            `.highlight-block[data-block-idx="${this.highlightedBlock.type}-${this.highlightedBlock.pdf1Page}-${this.highlightedBlock.pdf1BlockIdx}"]`
           );
           if (oldHighlightBlock) oldHighlightBlock.style.backgroundColor = "rgba(255, 0, 0, 0.2)";
-
+        }
+        if (this.$refs.pdf2Container && this.pdf2HightedBlock) {
+          const oldHighlightBlock = this.$refs.pdf2Container.querySelector(
+            `.highlight-block[data-block-idx="${this.pdf2HightedBlock.type}-${this.pdf2HightedBlock.pdf2Page}-${this.pdf2HightedBlock.pdf2BlockIdx}"]`
+          );
+          if (oldHighlightBlock) oldHighlightBlock.style.backgroundColor = "rgba(255, 0, 0, 0.2)";
         }
         this.highlightedBlock = item;
-        const highlightBlock = window.document.querySelector(
-          `.highlight-block[data-block-idx="${this.highlightedBlock.pdf1Page}-${this.highlightedBlock.pdf1BlockIdx}"]`
+        this.pdf2HightedBlock = item;
+        const highlightBlock = this.$refs.pdfContainer.querySelector(
+          `.highlight-block[data-block-idx="${this.highlightedBlock.type}-${this.highlightedBlock.pdf1Page}-${this.highlightedBlock.pdf1BlockIdx}"]`
         );
         if (highlightBlock) highlightBlock.style.backgroundColor = "rgba(255, 255, 0, 0.5)";
+
+        if (this.$refs.pdf2Container) {
+          const highlightBlock2 = this.$refs.pdf2Container.querySelector(
+            `.highlight-block[data-block-idx="${this.pdf2HightedBlock.type}-${this.pdf2HightedBlock.pdf2Page}-${this.pdf2HightedBlock.pdf2BlockIdx}"]`
+          );
+          if (highlightBlock2) highlightBlock2.style.backgroundColor = "rgba(255, 255, 0, 0.5)";
+        }
       };
 
-      const pageNum = item.pdf1Page;
-      this.scrollToTargetPage(pageNum);
+      const pageNum1 = item.pdf1Page;
+      const pageNum2 = item.pdf2Page;
+      this.scrollToTargetPage(pageNum1,  pageNum2);
 
       setTimeout(() => {
         execHighlightBlock();
@@ -321,7 +508,7 @@ export default {
 
     async handleExportPdf() {
       this.$message.info('正在初始化导出，请稍后')
-      const pdfPages = document.querySelectorAll('.pdf-page')
+      const pdfPages = this.$refs.pdfContainer.querySelectorAll('.pdf-page')
       for (let i = 0; i < pdfPages.length; i++) {
         const page = pdfPages[i];
         if (!page.firstChild.isRendered) {
@@ -362,13 +549,13 @@ export default {
 .pdfContainer {
   position: relative;
   height: 100%;
-  overflow-y: scroll;
-  flex-shrink: 0;
+  overflow: scroll;
   display: flex;
   align-items: center;
   justify-content: flex-start;
   flex-direction: column;
   flex-grow: 1;
+  flex-basis: 30%;
   background-color: #f4f5f5;
 }
 .pdf-page {
@@ -400,10 +587,10 @@ export default {
 }
 .res-list {
   position: relative;
-  width: 30%;
   height: 100%;
   min-width: 303px;
   flex-shrink: 0;
+  flex-basis: 30%;
   overflow-y: scroll;
   box-sizing: border-box;
   padding: 20px 14px 0 16px;
@@ -604,6 +791,11 @@ export default {
   bottom: 70px;
 }
 .export-btn {
+  position: fixed;
+  right: 32%;
+  bottom: 80px;
+}
+.compare-btn {
   position: fixed;
   right: 32%;
   bottom: 20px;

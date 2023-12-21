@@ -38,7 +38,7 @@ const routes = [
   { path: '/login', component: login, name: 'login' },
   { path: '/user-admin', component: userAdmin, name: 'userAdmin' },
   { path: '/task-list', component: TaskList },
-  { path: '/pdf-preview', component: PDFPreview },
+  { path: '/pdf-preview', component: PDFPreview, name: 'pdf-preview' },
   { path: '/report-list', component: ReportList },
   { path: '/file-upload', component: FileUpload },
   { path: '/report-detail', component: ReportDetail}

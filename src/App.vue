@@ -28,7 +28,8 @@ export default {
     '$route'(to) {
       console.log('watch $route', to);
       // 如果当前路由是登录页面，不显示 Sidebar
-      this.showSidebar = to.name !== 'login';
+
+      this.showSidebar = !(to.name === 'login' || to.name === 'pdf-preview')
     }
   },
   errorCaptured(err, vm, info) {

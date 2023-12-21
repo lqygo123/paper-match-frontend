@@ -5,7 +5,7 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "postbuild": "cp -r dist ../paper-match-backend/static",
+    "postbuild": "rm -rf ../paper-match-backend/static/dist && cp -r dist ../paper-match-backend/static",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
