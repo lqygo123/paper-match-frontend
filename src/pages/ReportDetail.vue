@@ -158,7 +158,7 @@ export default {
           ...item,
           biddingFileName: decodeURIComponent(item.biddingFileName),
           targetFileName: decodeURIComponent(item.targetFileName),
-          repetitionRate: `${parseFloat(item.abstract.repetitionRate) * 100}`.substring(0, 5) + '%',
+          repetitionRate: `${parseFloat(item.abstract.repetitionRate) * 100 || 0}`.substring(0, 5) + '%',
           sameImage: `${item.abstract.imageRepetitionCount}/${item.abstract.imageTotal}`,
           sameSentence: `${item.abstract.textRepetitionCount}/${item.abstract.textTotal}`,
         };

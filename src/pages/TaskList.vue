@@ -7,9 +7,10 @@
         <div class="task-list-item">创建者</div>
         <div class="task-list-item">比对状态</div>
         <div class="task-list-item">上传时间</div>
+        <div class="task-list-item">操作</div>
       </div>
       <div class="no-task" v-else>
-        暂无任务
+        暂无任务，<el-link type="primary" @click="() => { $router.push('/report-list') }">点击查看最新报告</el-link> 
       </div>
 
       <div class="task-list-item" v-for="batchItem in groupedList" :key="batchItem.batchId + Math.random()">

@@ -50,7 +50,6 @@
         :data="reports"
         border
         style="width: 100%"
-        @row-click="goDetail"
       >
         <el-table-column
           align="center"
@@ -72,35 +71,41 @@
         </el-table-column>
         <el-table-column align="center" prop="results" label="文件数量">
         </el-table-column>
+
+        <el-table-column align="center" label="操作">
+          <template slot-scope="scope">
+            <el-button
+              type="primary"
+              size="mini"
+              @click="deleteReport(scope.row._id)"
+              >删除</el-button
+            >
+            <el-button
+              type="primary"
+              size="mini"
+              @click="goDetail(scope.row)"
+              >查看</el-button
+            >
+          </template>
+        </el-table-column>
       </el-table>
-      <!-- <div
-        class="report-item"
-        v-for="(report, index) in reports"
-        :key="index"
-        @click="
-          $router.push({ path: '/report-detail', query: { id: report._id } })
-        "
-      >
-        <div class="report-item-content">
-          项目名称{{ report.metaInfo?.projectName }}
-        </div>
-        <div class="report-item-content">
-          招标编号: {{ report.metaInfo?.biddingNumber }}
-        </div>
-        <div class="report-item-content">
-          招标单位: {{ report.metaInfo?.biddingCompany }}
-        </div>
-        <div class="report-item-content">时间: {{ report.metaInfo?.time }}</div>
-        <div class="report-item-content">
-          文件数量: {{ report.results?.length }}
-        </div>
-      </div> -->
+      <!-- 分页 -->
+      <div class="pagination">
+        <el-pagination
+          layout="prev, pager, next, jumper"
+          :total="pagination.total"
+          :page-size="pagination.pageSize"
+          :current-page="pagination.page"
+          @current-change="getReports"
+        ></el-pagination>
+      </div>
+
     </div>
   </div>
 </template>
 
 <script>
-import { getReports } from "../apis";
+import { getReports, deleteReport } from "../apis";
 
 export default {
   name: "ReportDetail",
@@ -111,6 +116,12 @@ export default {
     return {
       value1: "",
       reports: [],
+      // 分页对象
+      pagination: {
+        page: 1,
+        pageSize: 10,
+        total: 0,
+      },
       filters: {
         projectName: "",
         biddingNumber: "",
@@ -135,12 +146,16 @@ export default {
     goDetail(row) {
       this.$router.push({ path: "/report-detail", query: { id: row._id } });
     },
-    async getReports() {
+    async getReports(pageNum = 1) {
       console.log("test");
+      const { pageSize } = this.pagination;
+      this.pagination.page = pageNum;
+      this.filters.page = pageNum;
+      this.filters.pageSize = pageSize;
       const res = await getReports(this.filters);
       console.log(res.data);
       // this.reports = res.data;
-
+      this.pagination.total = res.total;
       this.reports = res.data.map((item) => {
         let tmp = {};
         if (item.metaInfo) {
@@ -162,6 +177,12 @@ export default {
         console.log(tmp)
         return tmp;
       });
+    },
+
+    async deleteReport(id) {
+      const res = await deleteReport(id);
+      console.log(res);
+      this.getReports(this.pagination.page);
     },
   },
 };
@@ -195,6 +216,13 @@ export default {
   align-items: center;
   justify-content: center;
   flex-direction: column;
+}
+
+.pagination {
+  margin-top: 20px;
+  margin-right: 50px;
+  display: flex;
+  justify-content: flex-end;
 }
 
 .report-list {

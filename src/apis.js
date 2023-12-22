@@ -67,6 +67,10 @@ const getReports = async (queryOptions) => {
   return await authedRequest(() => instance.get(`api/v1/duplicate/reports`, { params: queryOptions }));
 }
 
+const deleteReport = async (id) => {
+  return await authedRequest(() => instance.post(`api/v1/duplicate/delete-report`, { id }));
+}
+
 const uploadFile = async (formData, processCallback) => {
   return await authedRequest(() => instance.post(`api/v1/file/upload`, formData, {
     headers: {
@@ -140,6 +144,7 @@ export {
   getDuplicateDetail,
   saveReport,
   getReports,
+  deleteReport,
   uploadFile,
   createReport,
   execDuplicate,
