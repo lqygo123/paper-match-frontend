@@ -17,6 +17,9 @@
         <div class="task-list-item">{{ batchItem.creator.role === 'admin' ? '管理员' : batchItem.creator.name || '-' }}</div>
         <div class="task-list-item">{{ batchItem.total - batchItem.waitting - batchItem.running }}/{{ batchItem.total }}</div>
         <div class="task-list-item">{{ batchItem.createAt }}</div>
+        <div class="task-list-item">
+          <el-button type="primary" size="mini" @click="cancelTask(batchItem.batchId)">取消</el-button>
+        </div>
       </div>
 
       <!-- <div class="task-list-item" v-for="task in runningTaskList" :key="task.id">
@@ -33,7 +36,7 @@
 
 <script>
 // import HelloWorld from './components/HelloWorld.vue';
-import { getCurrentTasks } from '../apis';
+import { getCurrentTasks, cancelBatchDuplicateTask } from '../apis';
 import { formateTime } from '../utils'
 
 export default {
@@ -213,7 +216,10 @@ export default {
       });
 
       console.log('groupedList', this.groupedList);
-    }
+    },
+    cancelTask(batchId) {
+      cancelBatchDuplicateTask(batchId);
+    },
   }
 };
 </script>

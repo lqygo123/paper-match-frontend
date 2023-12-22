@@ -120,6 +120,19 @@ const updateUser = async (userId, info) => {
   return await authedRequest(() => instance.post(`api/v1/user/update-user`, { userId, info }));
 }
   
+/*
+router.post("/cancel-batch-duplicate-task", async (req, res) => {
+  const { batchId } = req.body;
+  taskQueue.running.filter(item => item.batchId === batchId).forEach(item => {
+    taskQueue.cancel(item.taskId)
+  })
+  res.json({ code: 0, message: "取消成功" });
+});
+*/
+
+const cancelBatchDuplicateTask = async (batchId) => {
+  return await authedRequest(() => instance.post(`api/v1/duplicate/cancel-batch-duplicate-task`, { batchId }));
+}
 
 export {
   getReportDetail,
@@ -135,6 +148,7 @@ export {
   updateUser,
 
   createBatchDuplicate,
+  cancelBatchDuplicateTask,
   getCurrentTasks,
 
   logout
