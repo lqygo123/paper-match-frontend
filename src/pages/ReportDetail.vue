@@ -102,6 +102,8 @@
       </el-table>
     </div>
     <div class="bottom-con">
+      <!-- 返回 -->
+      <el-button size="mini" @click="$router.push('/report-list')">返回</el-button>
       <el-button type="primary" size="mini" v-if="mode === 'detail'" @click="handleEdit">编辑</el-button>
       <el-button type="primary" size="mini" v-if="mode === 'detail'" @click="exportPdf">导出报告</el-button>
       <el-button type="primary" size="mini" v-if="mode === 'edit'" @click="handleSave">保存</el-button>
@@ -336,9 +338,11 @@ export default {
   position: relative;
 }
 
-.header-item .label {
+.header-item {
   display: inline-block;
   width: 120px;
+  font-size: 14px;
+  color: #666666;
 }
 
 .header-item .el-input {

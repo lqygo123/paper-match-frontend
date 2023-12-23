@@ -1,46 +1,81 @@
-<!-- eslint-disable no-unused-vars -->
 <template>
-  <div class="flex">
-    <!-- <div class="wrap"> -->
-    <div class="pdfContainer" id="pdfContainer" ref="pdfContainer"></div>
-    <div class="pdfContainer" v-if="showPdf2" id="pdf2Container" ref="pdf2Container"></div>
-
-    <div class="res-list" id="right" :style="'width:' + leftWidth + 'px'">
-      <!-- <div class="line" v-drag></div> -->
-      <div class="header">
-        <div class="title">重复率</div>
-        <div class="content">
-          {{ compireResult.abstract.textRepetitionCount }} / {{ compireResult.abstract.textTotal }}
-        </div>
+  <div class="preview-page">
+    <div class="preview-page-header">
+      <div class="left">
+        <!-- button 返回 -->
+        <el-button
+          size="mini"
+          @click="$router.back()"
+        >返回</el-button>
       </div>
-      <div
-        v-for="(item, index) in MockMatchRes"
-        :key="index"
-        class="res-item"
-        :class="{ active: item.id === highlightedBlock.id }"
-        @click="handleResItemClick(item)"
-        :data-id="item.id"
-      >
-        <div class="res-item_title">
-          <div class="index">{{ item.index + 1 }}</div>
-          <div class="content"> {{ decodeURIComponent(compireResult.targetFileName) }} 第{{ item.pdf2Page }}页 </div>
-          <div class="icon"></div>
-        </div>
-
-        <div class="res-item_card" v-if="item.id === highlightedBlock.id">
-          <div class="res-item_card-head">重复内容：</div>
-          <div v-if="item.type === 'image'">
-            <img :src="`${domain}${item.imgSrc}`" alt="">
-          </div>
-          <div v-else>
-            {{ item.text }}
-          </div>
-        </div>
+      <div class="right">
+        <el-button
+          @click="handleShowPdf2"
+          size="mini"
+        >{{ showPdf2 ? '关闭对比文件' : '显示对比文件' }}</el-button>
+        <el-button
+          @click="handleExportPdf"
+          type="primary"
+          size="mini"
+        >导出</el-button>
       </div>
     </div>
+    <div class="flex">
+      <div
+        class="pdfContainer"
+        id="pdfContainer"
+        ref="pdfContainer"
+      ></div>
+      <div
+        class="pdfContainer"
+        v-if="showPdf2"
+        id="pdf2Container"
+        ref="pdf2Container"
+      ></div>
+    </div>
 
-    <el-button class="export-btn" @click="handleExportPdf" type="primary">导出</el-button>
-    <el-button class="compare-btn" @click="handleShowPdf2" type="primary">{{ showPdf2 ? '关闭对比文件' : '显示对比文件' }}</el-button>
+    <div
+        class="res-list"
+        id="right"
+      >
+        <div class="header">
+          <div class="title">重复率</div>
+          <div class="content">
+            {{ compireResult.abstract.textRepetitionCount }} / {{ compireResult.abstract.textTotal }}
+          </div>
+        </div>
+        <div
+          v-for="(item, index) in MockMatchRes"
+          :key="index"
+          class="res-item"
+          :class="{ active: item.id === highlightedBlock.id }"
+          @click="handleResItemClick(item)"
+          :data-id="item.id"
+        >
+          <div class="res-item_title">
+            <div class="index">{{ item.index + 1 }}</div>
+            <div class="content"> {{ decodeURIComponent(compireResult.targetFileName) }} 第{{ item.pdf2Page }}页 </div>
+            <div class="icon"></div>
+          </div>
+
+          <div
+            class="res-item_card"
+            v-if="item.id === highlightedBlock.id"
+          >
+            <div class="res-item_card-head">重复内容：</div>
+            <div v-if="item.type === 'image'">
+              <img
+                :src="`${domain}${item.imgSrc}`"
+                alt=""
+              >
+            </div>
+            <div v-else>
+              {{ item.text }}
+            </div>
+          </div>
+        </div>
+    </div>
+
   </div>
 </template>
 
@@ -51,16 +86,13 @@ import jsPDF from 'jspdf';
 import { DOMAIN } from '../../config'
 import { getDuplicateDetail } from '../apis'
 
-// const data = require("../../jsons/output_digital.json");
-// const data = require("../../jsons/output_scan_transfromed.json");
-
 const parseCord = (cord, height, factor) => {
   // eslint-disable-next-line no-unused-vars
   const [cord1, cord2, cord3, cord4] = cord
   if (cord1.length) {
-    return [cord1[0]* factor, cord1[1]* factor, cord3[0]* factor, cord3[1]* factor]
+    return [cord1[0] * factor, cord1[1] * factor, cord3[0] * factor, cord3[1] * factor]
   } else {
-    return [cord1 * factor,  (  cord2) * factor, cord3 * factor, (  cord4) * factor]
+    return [cord1 * factor, (cord2) * factor, cord3 * factor, (cord4) * factor]
   }
 };
 
@@ -105,7 +137,7 @@ export default {
     } else {
       this.factor = 1
     }
-    
+
     console.log('compireResult', compireResult.data)
     console.log('compireResult detail', compireResult.detail)
 
@@ -195,7 +227,6 @@ export default {
           }, 100);
         })
       } else {
-
         this.$loading({
           lock: true,
           text: '正在加载中',
@@ -249,8 +280,8 @@ export default {
           height: page.height * this.factor,
         };
         const context = canvas.getContext("2d");
-        canvas.height = viewport.height ;
-        canvas.width = viewport.width ;
+        canvas.height = viewport.height;
+        canvas.width = viewport.width;
         // drawImage from base64Data in page.data
         const img = new Image();
         // 组装 dataurl
@@ -317,7 +348,7 @@ export default {
         div.dataset.id = block.id;
         div.dataset.index = block.index + 1;
         div.dataset.blockIdx = `${block.type}-${block.pdf2Page}-${block.pdf2BlockIdx}`;
-        
+
         // 为 div 添加点击事件，点击时高亮，并 log 当前的 block 信息
         div.addEventListener("click", async () => {
           console.log("hight block click", block.id);
@@ -348,15 +379,15 @@ export default {
       if (this.mode === 'ocr') {
         const page = this.ocrPages[pageNum - 1];
         const viewport = {
-          width: page.width ,
-          height: page.height ,
+          width: page.width,
+          height: page.height,
         };
         canvas.height = viewport.height * this.factor;
         canvas.width = viewport.width * this.factor;
       } else {
         const page = await this.pdfDocument.getPage(pageNum);
         const viewport = page.getViewport({ scale: 1 });
-        canvas.height = viewport.height  * this.factor;
+        canvas.height = viewport.height * this.factor;
         canvas.width = viewport.width * this.factor;
       }
     },
@@ -408,7 +439,7 @@ export default {
         div.dataset.id = block.id;
         div.dataset.index = block.index + 1;
         div.dataset.blockIdx = `${block.type}-${block.pdf1Page}-${block.pdf1BlockIdx}`;
-        
+
 
         // 为 div 添加点击事件，点击时高亮，并 log 当前的 block 信息
         div.addEventListener("click", async () => {
@@ -438,8 +469,8 @@ export default {
           height: page.height * this.factor,
         };
         const context = canvas.getContext("2d");
-        canvas.height = viewport.height ;
-        canvas.width = viewport.width ;
+        canvas.height = viewport.height;
+        canvas.width = viewport.width;
         // drawImage from base64Data in page.data
         const img = new Image();
         // 组装 dataurl
@@ -514,7 +545,7 @@ export default {
 
       const pageNum1 = item.pdf1Page;
       const pageNum2 = item.pdf2Page;
-      this.scrollToTargetPage(pageNum1,  pageNum2);
+      this.scrollToTargetPage(pageNum1, pageNum2);
 
       setTimeout(() => {
         execHighlightBlock();
@@ -561,13 +592,33 @@ export default {
 </script>
 
 <style>
+.preview-page {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+}
+
+.preview-page-header {
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fff;
+  padding: 0 20px;
+}
+
+
 .flex {
   display: flex;
   align-items: center;
   justify-content: center;
   box-sizing: border-box;
-  height: 100%;
+  height: calc(100% - 60px);
   width: 70%;
+  position: relative;
 }
 
 .pdfContainer {
@@ -578,11 +629,12 @@ export default {
   background-color: #f4f5f5;
   text-align: center;
 }
+
 .res-list {
   position: absolute;
-  height: 100%;
+  height: calc(100% - 60px);
   width: 30%;
-  top: 0;
+  top: 60px;
   right: 0;
   overflow: scroll;
   padding: 20px 14px 0 16px;
@@ -594,10 +646,12 @@ export default {
   position: relative;
   display: inline-block;
 }
+
 .highlight-block {
   font-size: 10px;
   color: rgba(0, 0, 0, 0.2);
 }
+
 .highlight-block::before {
   content: attr(data-index);
   position: absolute;
@@ -629,28 +683,34 @@ export default {
   text-align: center;
   font-weight: bold;
 }
+
 .res-item {
   width: 100%;
-  transition: all cubic-bezier(0.39, 0.575, 0.565, 1);
+  /* transition: all cubic-bezier(0.39, 0.575, 0.565, 1); */
   background: #fafafb;
   border-radius: 4px;
-  display: flex;
+  /* display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: center; */
   margin-bottom: 16px;
+  padding-bottom: 1px;
 }
+
 .res-item * {
   box-sizing: border-box;
 }
+
 .res-item_title .icon {
   width: 16px;
   height: 16px;
   /* background: #007bff; */
   background: url(../assets/down.svg) no-repeat;
 }
+
 .res-item.active .res-item_title .icon {
   background: url(../assets/up.svg) no-repeat;
 }
+
 .res-item_title {
   width: 100%;
   display: flex;
@@ -664,8 +724,8 @@ export default {
   padding: 13px 20px 12px;
   cursor: pointer;
 }
+
 .res-item_card {
-  width: -webkit-fill-available;
   background: #ffffff;
   padding: 20px 16px;
   font-size: 14px;
@@ -690,24 +750,18 @@ export default {
 
 .res-item .index {
   height: 20px;
-  /* width: 20px; */
   line-height: 20px;
   text-align: center;
   background: #007bff;
   font-size: 12px;
   color: #fff;
-  /* margin-bottom: 10px; */
   display: inline-block;
   padding: 0 4px;
-  /* border: 1px solid #999; */
-  /* padding: 5px; */
 }
+
 .res-item:hover:not(.active) {
   background-color: #f4f5f5;
   cursor: pointer;
-}
-.res-item.active {
-  /* background-color: #e6f7ff; */
 }
 
 .res-item.active .res-item_title {
@@ -716,6 +770,7 @@ export default {
   margin-bottom: 16px;
   border: none;
 }
+
 .res-item .content {
   overflow: hidden;
   /* width: 80%; */
@@ -727,6 +782,7 @@ export default {
   display: inline-block;
   vertical-align: bottom;
 }
+
 .res-item .content-detail {
   word-break: break-all;
   padding: 0 20px;
@@ -738,27 +794,29 @@ export default {
   /* 支持换行 */
   white-space: pre-wrap;
 }
+
 .pos {
   font-size: 12px;
   color: #999;
   margin-top: 10px;
   text-align: right;
 }
+
 /* add -12-03*/
 .header {
   display: flex;
   align-items: center;
-  justify-content: space-around;
-  /* align-items: flex-end; */
+  justify-content: space-between;
+  align-items: flex-end;
   margin-bottom: 20px;
 }
+
 .title {
-  font-size: 32px;
+  font-size: 16px;
   font-weight: 500;
-  /* color: #007bff; */
   color: #303133;
-  line-height: 32px;
 }
+
 .header .content {
   font-size: 14px;
   font-weight: 400;
@@ -766,6 +824,7 @@ export default {
   line-height: 22px;
   margin-right: 10px;
 }
+
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -780,6 +839,7 @@ export default {
   border-radius: 3px;
   background: #a7a8a9;
 }
+
 .download {
   position: fixed;
   right: 20px;
@@ -804,11 +864,13 @@ export default {
   border: 1px solid #007bff;
   bottom: 70px;
 }
+
 .export-btn {
   position: fixed;
   right: 32%;
   bottom: 80px;
 }
+
 .compare-btn {
   position: fixed;
   right: 32%;

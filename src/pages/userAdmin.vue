@@ -2,80 +2,89 @@
   <div class="user-admin">
     <div class="user-admin-header">用户管理</div>
     <div class="user-list">
-      <div class="user-item" v-for="(user, index) in users" :key="index">
-        <el-checkbox class="check-box" v-model="user.checked"></el-checkbox>
-        <div class="user-item-content">
-          <div class="edit" v-if="user.isEdit">
-            <el-input
-              v-model="users[index].name"
+      <el-table :data="users"  style="width: 100%" @selection-change="handleSeletionChange">
+        <el-table-column type="selection" align="center" width="55"></el-table-column>
+        <el-table-column prop="name" align="center" label="姓名">
+          <template slot-scope="scope">
+            <div v-if="scope.row.isEdit">
+              <el-input
+                v-model="scope.row.name"
+                type="text"
+                placeholder="请输入姓名"
+              >
+                <i slot="prefix" class="el-input__icon el-icon-user"></i>
+              </el-input>
+            </div>
+            <div v-else>{{ scope.row.name }}</div>
+          </template>
+        </el-table-column>
+        <el-table-column prop="username" align="center" label="登录账号">
+          <template slot-scope="scope">
+            <div v-if="scope.row.isEdit">
+              <el-input
+                v-model="scope.row.username"
+                type="text"
+                placeholder="请输入登录账号"
+              >
+                <i slot="prefix" class="el-input__icon el-icon-user"></i>
+              </el-input>
+            </div>
+            <div v-else>{{ scope.row.username }}</div>
+          </template>
+        </el-table-column>
+        <el-table-column prop="password" align="center" label="密码">
+          <template slot-scope="scope">
+            <div v-if="scope.row.isEdit">
+              <el-input
+                v-model="scope.row.password"
+                type="text"
+                placeholder="请输入密码"
+              >
+                <i slot="prefix" class="el-input__icon el-icon-lock"></i>
+              </el-input>
+            </div>
+            <div v-else>{{ scope.row.password }}</div>
+          </template>
+        </el-table-column>
+        <el-table-column prop="enabled" align="center" label="授权">
+          <template slot-scope="scope">
+            <div :class="scope.row.enabled ? 'accredit green' : 'accredit red'">
+              {{ scope.row.enabled ? '已授权' : '未授权' }}
+            </div>
+          </template>
+        </el-table-column>
+        <!-- 编辑 -->
+        <el-table-column label="操作" align="center" >
+          <template slot-scope="scope">
+            <el-button
+              v-if="!scope.row.isEdit"
+              @click="scope.row.isEdit = true"
               type="text"
-              placeholder="请输入姓名"
+              size="small"
             >
-              <i slot="prefix" class="el-input__icon el-icon-user"></i>
-            </el-input>
-          </div>
-          <div class="desc" v-else>姓名: {{ user.name }}</div>
-        </div>
-        <div class="user-item-content">
-          <div class="edit" v-if="user.isEdit">
-            <el-input
-              v-model="users[index].username"
+              编辑
+            </el-button>
+            <el-button
+              v-if="scope.row.isEdit"
+              @click="scope.row.isEdit = false"
               type="text"
-              placeholder="请输入登录账号"
+              size="small"
             >
-              <i slot="prefix" class="el-input__icon el-icon-user"></i>
-            </el-input>
-          </div>
-          <div class="desc" v-else>登录账号: {{ user.username }}</div>
-        </div>
-        <div class="user-item-content">
-          <div class="edit" v-if="user.isEdit">
-            <el-input
-              v-model="users[index].password"
+              取消
+            </el-button>
+            <el-button
+              v-if="scope.row.isEdit"
+              @click="updateUser(scope.row)"
               type="text"
-              placeholder="请输入密码"
+              size="small"
             >
-              <i slot="prefix" class="el-input__icon el-icon-lock"></i>
-            </el-input>
-          </div>
-          <div class="desc" v-else>密码: {{ user.password }}</div>
-        </div>
-        <div class="user-item-content-small">
-          <div class="edit" v-if="user.isEdit">
-            <el-checkbox v-model="users[index].enabled">授权</el-checkbox>
-          </div>
-          <div class="desc" :class="user.enabled ? 'green' : 'red'" v-else>
-            {{ user.enabled ? '已授权' : '未授权' }}
-          </div>
-        </div>
-        <div class="user-item-content-small">
-          <el-button
-            v-if="!user.isEdit"
-            @click="user.isEdit = true"
-            type="primary"
-            size="small"
-          >
-            编辑
-          </el-button>
-          <el-button
-            v-if="user.isEdit"
-            @click="user.isEdit = false"
-            type="primary"
-            size="small"
-          >
-            取消
-          </el-button>
-          <el-button
-            v-if="user.isEdit"
-            @click="updateUser(user)"
-            type="primary"
-            size="small"
-          >
-            保存
-          </el-button>
-        </div>
-      </div>
+              保存
+            </el-button>
+          </template>
+        </el-table-column>
+      </el-table>
     </div>
+
     <div class="user-admin-bottom">
       <el-button type="primary" size="small" @click="handleEnableMuti">{{
         isAllCheckedUserEnabled ? '取消授权选中账号' : '授权选中账号'
@@ -139,6 +148,12 @@ export default {
       }
       userInfo.isEdit = false
     },
+    handleSeletionChange(val) {
+      console.log(val)
+      this.users.forEach((item) => {
+        item.checked = val.includes(item)
+      })
+    },
     async handleEnableMuti() {
       const payload = {
         enabled: !this.isAllCheckedUserEnabled,
@@ -182,6 +197,10 @@ export default {
   font-weight: bold;
 }
 
+.center-text {
+    text-align: center;
+}
+
 .user-list {
   width: 100%;
   height: calc(100% - 60px);
@@ -196,11 +215,21 @@ export default {
   height: 40px;
 }
 
-.user-item .green {
-  color: #67c23a;
+.accredit::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 5px;
+}
+
+.accredit.green::before {
+  background-color: #67c23a;
+
 } 
-.user-item .red {
-  color: #f56c6c;
+.accredit.red::before {
+  background-color: #f56c6c;
 }
 
 .check-box {
