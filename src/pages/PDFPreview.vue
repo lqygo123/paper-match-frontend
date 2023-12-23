@@ -546,22 +546,38 @@ export default {
 </script>
 
 <style>
+.flex {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  height: 100%;
+  width: 70%;
+}
 .pdfContainer {
   position: relative;
   height: 100%;
-  overflow: scroll;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  flex-direction: column;
-  flex-grow: 1;
-  flex-basis: 30%;
+  flex: 1 1 30%;
+  overflow: auto;
   background-color: #f4f5f5;
+  text-align: center;
 }
+.res-list {
+  position: absolute;
+  height: 100%;
+  width: 30%;
+  top: 0;
+  right: 0;
+  overflow: scroll;
+  padding: 20px 14px 0 16px;
+}
+
 .pdf-page {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-  margin: 40px 0;
+  margin: 40px auto;
   position: relative;
+  display: inline-block;
+
 }
 .highlight-block {
   font-size: 10px;
@@ -578,23 +594,7 @@ export default {
   background: inherit;
   padding: 0 5px;
 }
-.flex {
-  display: flex;
-  align-items: start;
-  justify-content: start;
-  box-sizing: border-box;
-  height: 100%;
-}
-.res-list {
-  position: relative;
-  height: 100%;
-  min-width: 303px;
-  flex-shrink: 0;
-  flex-basis: 30%;
-  overflow-y: scroll;
-  box-sizing: border-box;
-  padding: 20px 14px 0 16px;
-}
+
 .line {
   position: absolute;
   z-index: 2020000;

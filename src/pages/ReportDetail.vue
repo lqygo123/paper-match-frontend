@@ -4,7 +4,7 @@
     <div class="header-con">
       <div class="header-desc"> {{ mode === 'edit' ? '编辑报告' : '查重报告结果' }}</div>
     </div>
-    <div class="main-con">
+    <div class="pdf-export-main-con">
       <div class="report-header">
           <div class="header-item">
             <span class="label">项目名称：</span>
@@ -204,13 +204,13 @@ export default {
         }, 100)
       })
 
-      const element = document.querySelector('.main-con');
+      const element = document.querySelector('.pdf-export-main-con');
       const bottomCon = document.querySelector('.bottom-con');
 
       const originalDisplay = bottomCon.style.display;
       bottomCon.style.display = 'none';
 
-      // 暂时修改 main-con 让它不要滚动，从而可以绘制全部内容
+      // 暂时修改 pdf-export-main-con 让它不要滚动，从而可以绘制全部内容
       element.style.overflowY = 'visible';
       element.style.height = 'auto';
 
@@ -222,7 +222,7 @@ export default {
       const imgData = canvas.toDataURL('image/png');
       bottomCon.style.display = originalDisplay;
 
-      // 考虑 main-con 可能滚动，如有滚动，要把滚动下面的内容也画进 pdf
+      // 考虑 pdf-export-main-con 可能滚动，如有滚动，要把滚动下面的内容也画进 pdf
       const width = element.scrollWidth * 0.264583;
       const height = element.scrollHeight * 0.264583;
 
@@ -230,7 +230,7 @@ export default {
       element.style.overflowY = 'auto';
       element.style.height = 'calc(100% - 120px)';
 
-      // 创建一个与 .main-con 元素大小一致的 jsPDF 实例
+      // 创建一个与 .pdf-export-main-con 元素大小一致的 jsPDF 实例
       const pdf = new jsPDF({
         orientation: height > width ? 'portrait' : 'landscape',
         unit: 'mm',
@@ -293,7 +293,7 @@ export default {
   justify-content: center;
 }
 
-.report-detail .main-con {
+.report-detail .pdf-export-main-con {
   margin-top: 60px;
   margin-bottom: 60px;
   height: calc(100% - 120px);

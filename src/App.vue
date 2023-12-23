@@ -23,6 +23,7 @@ export default {
   },
   mounted() {
     console.log('mounted', this.$route);
+    this.showSidebar = !(this.$route.name === 'login' || this.$route.name === 'pdf-preview')
   },
   watch: {
     '$route'(to) {
