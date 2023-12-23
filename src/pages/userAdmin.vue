@@ -184,7 +184,7 @@ export default {
 
 .user-list {
   width: 100%;
-  height: calc(100% - 45px);
+  height: calc(100% - 60px);
   overflow: auto;
   padding: 24px;
 }
@@ -218,7 +218,7 @@ export default {
 }
 
 .user-admin-bottom {
-  height: 45px;
+  height: 60px;
   width: 100%;
   border-top: 1px solid #e6e6e6;
   position: absolute;

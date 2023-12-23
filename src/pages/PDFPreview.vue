@@ -792,7 +792,7 @@ export default {
   text-align: center;
   box-sizing: border-box;
   outline: 0;
-  background-color: #007bff;
+  /* background-color: #007bff; */
   padding: 8px 15px;
   font-size: 16px;
   border-radius: 4px;

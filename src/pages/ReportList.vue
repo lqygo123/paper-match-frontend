@@ -54,7 +54,7 @@
         style="width: 100%"
         @selection-change="handleSeletionChange"
       >
-        <el-table-column type="selection" width="55"></el-table-column>
+        <el-table-column type="selection" align="center" class-name="felxc" width="50"></el-table-column>
         <el-table-column
           align="center"
           prop="projectName"
@@ -79,13 +79,14 @@
         <el-table-column align="center" label="操作">
           <template slot-scope="scope">
             <el-button
-              type="primary"
+            type="text"
               size="mini"
               @click="goDetail(scope.row)"
               >查看</el-button
             >
             <el-button
-              type="danger"
+              type="text"
+              class="danger-text-button"
               size="mini"
               @click="deleteReport(scope.row._id)"
               >删除</el-button
@@ -249,15 +250,25 @@ export default {
   left: 0;
 }
 
-.el-form-item  {
-  margin-bottom: 10px;
+.felxc {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.filter .el-form-item  {
+  margin-bottom: 20px;
+  margin-right: 20px;
 }
 .filter {
   background: #FAFAFA;
-  padding: 20px;
+  padding: 20px 0 0 20px;
   border-radius: 10px;
   margin-bottom: 20px;
   display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
 }
 #main-page .el-date-editor .el-range-separator {
   box-sizing: content-box;
@@ -272,6 +283,7 @@ export default {
   border-radius: 8px;
   padding: 24px;
   margin: 24px;
+  /* width: 100%; */
   height: calc(100% - 48px);
   position: relative;
   display: flex;
@@ -293,17 +305,20 @@ export default {
   width: 100%;
 }
 
-::v-deep .el-button--primary {
-  background-color: #007bff;
-  border-color: #007bff;
+.danger-text-button {
+  color: #ff4d4f;
 }
+.danger-text-button:hover {
+  color: #ff7875;
+}
+
+
 </style>
 <style>
-.el-table .cell {
+/* .el-table .cell {
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
+} */
 
 </style>

@@ -158,7 +158,7 @@
     </div>
 
     <div class="buttons-wrap">
-      <el-button type="primary" @click="handleCompire">执行对比 </el-button>
+      <el-button type="primary" size="mini" @click="handleCompire">执行对比 </el-button>
     </div>
   </div>
 </template>
@@ -597,7 +597,7 @@ export default {
   height: 60px;
   border-top: 1px solid #e6e6e6;
 }
-.buttons-wrap .el-button {
+/* .buttons-wrap .el-button {
   width: 100px;
   height: 34px;
   border-radius: 4px;
@@ -608,7 +608,7 @@ export default {
   font-weight: 400;
   cursor: pointer;
   padding: 0;
-}
+} */
 
 .compare {
   margin-right: 20px;

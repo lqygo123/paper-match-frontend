@@ -92,7 +92,7 @@
         <el-table-column v-if="showPreview" align="center" label="操作">
           <template slot-scope="scope">
             <el-button
-              type="primary"
+              type="text"
               size="mini"
               @click="handleResultClick(scope.row)"
               >查看</el-button
@@ -100,14 +100,11 @@
           </template>
         </el-table-column>
       </el-table>
-
-
-
     </div>
     <div class="bottom-con">
-      <Button v-if="mode === 'detail'" @click="handleEdit">编辑</Button>
-      <Button v-if="mode === 'detail'" @click="exportPdf">导出报告</Button>
-      <Button v-if="mode === 'edit'" @click="handleSave">保存</Button>
+      <el-button type="primary" size="mini" v-if="mode === 'detail'" @click="handleEdit">编辑</el-button>
+      <el-button type="primary" size="mini" v-if="mode === 'detail'" @click="exportPdf">导出报告</el-button>
+      <el-button type="primary" size="mini" v-if="mode === 'edit'" @click="handleSave">保存</el-button>
     </div>
 
 
@@ -304,22 +301,6 @@ export default {
 
 .buttons {
   text-align: center;
-}
-
-.bottom-con button {
-  border: none;
-  bottom: 0px;
-  background: #007bff;
-  width: 90px;
-  height: 32px;
-  border-radius: 4px;
-  font-size: 16px;
-  color: #fff;
-  text-align: center;
-  line-height: 21px;
-  font-weight: 400;
-  cursor: pointer;
-  margin-right: 20px;
 }
 
 .buttons button:last-child {

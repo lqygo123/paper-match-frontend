@@ -62,7 +62,8 @@ export default {
   word-break: break-all;
 }
 .main-con {
-  flex: 1;
+  flex: auto;
+  min-width: 200px;
   height: 100%;
   background: #f5f5f5;
 }
