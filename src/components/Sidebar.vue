@@ -12,9 +12,8 @@
           <span>标书查重 </span>
         </template>
       </el-menu-item>
-      <!-- TaskList 查重进度 -->
       <el-menu-item index="/task-list">
-        <i class="el-icon-s-data"></i>
+        <i class="el-icon-odometer"></i>
         <span>查重进度</span>
       </el-menu-item>
       <el-menu-item index="/report-list">
@@ -25,10 +24,10 @@
         <i class="el-icon-user"></i>
         <span>用户管理</span>
       </el-menu-item>
-      <el-menu-item index="logout" class="bottom">
+      <div @click="handleLogout" class="el-menu-item bottom" >
         <i class="el-icon-switch-button"></i>
         <span>退出登录</span>
-      </el-menu-item>
+      </div>
     </el-menu>
   </div>
 </template>
@@ -51,12 +50,13 @@ export default {
   mounted() {
 
   },
+  watch: {
+    $route(to) {
+      this.activeIndex = to.path;
+    },
+  },
   methods: {
     handleLogout() {
-      // logout();
-      // this.$router.push("/login");
-
-      // modal 二次确认
       this.$confirm("确认退出登录吗？", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
@@ -70,10 +70,6 @@ export default {
     },
     handleSelect(key) {
       this.activeIndex = key;
-      if (key === 'logout') {
-        this.handleLogout()
-        return
-      }
       this.$router.push(
         key
       );

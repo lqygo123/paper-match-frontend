@@ -658,7 +658,6 @@ export default {
   align-items: center;
   border: 1px solid rgb(227, 228, 229);
   border-radius: 4px;
-  font-family: PingFang SC-Medium, PingFang SC;
   font-size: 16px;
   color: #303133;
   line-height: 24px;

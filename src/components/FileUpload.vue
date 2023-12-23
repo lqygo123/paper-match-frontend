@@ -572,8 +572,6 @@ export default {
   vertical-align: middle;
 }
 .select-file-text {
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
   font-size: 16px;
   color: #0f87ff;
   line-height: 24px;
@@ -582,13 +580,9 @@ export default {
 
 .file-restriction {
   margin-top: 8px;
-  /* padding: 0 24px; */
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
   font-size: 13px;
   color: #909499;
   letter-spacing: 0;
-
   line-height: 20px;
   font-weight: 400;
 }

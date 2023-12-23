@@ -74,4 +74,9 @@ export default {
   align-items: center;
   justify-content: center;
 }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei UI', 'Microsoft YaHei', 'Source Han Sans CN', 'Hiragino Sans GB', 'Segoe UI', 'Roboto', 'Ubuntu', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
+}
+
 </style>

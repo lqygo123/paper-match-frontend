@@ -9,9 +9,11 @@
         <div class="task-list-item">上传时间</div>
         <div class="task-list-item">操作</div>
       </div>
-      <div class="no-task" v-else>
-        暂无任务，<el-link type="primary" @click="() => { $router.push('/report-list') }">点击查看最新报告</el-link> 
-      </div>
+      <!-- <div class="no-task" v-else>
+        
+      </div> -->
+
+      <el-empty class="no-task" v-else><el-link type="primary" @click="() => { $router.push('/report-list') }">点击查看最新报告</el-link> </el-empty>
 
       <div class="task-list-item" v-for="batchItem in groupedList" :key="batchItem.batchId + Math.random()">
         <div class="task-list-item-name">{{ batchItem.projectName }}</div>
