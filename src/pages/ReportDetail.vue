@@ -48,7 +48,6 @@
         :data="results"
         border
         style="width: 100%"
-        @row-click="handleResultClick"
       >
         <el-table-column
           align="center"
@@ -89,6 +88,17 @@
           label="相似句子(条)"
         >
         </el-table-column>
+        <!-- 操作.查看按钮 -->
+        <el-table-column v-if="showPreview" align="center" label="操作">
+          <template slot-scope="scope">
+            <el-button
+              type="primary"
+              size="mini"
+              @click="handleResultClick(scope.row)"
+              >查看</el-button
+            >
+          </template>
+        </el-table-column>
       </el-table>
 
 
@@ -119,6 +129,7 @@ export default {
     return {
       id: "",
       mode: "detail", // 'edit'
+      showPreview: true,
       metaInfo: {
         projectName: "",
         biddingNumber: "",
@@ -185,6 +196,14 @@ export default {
     },
 
     async exportPdf() {
+
+      this.showPreview = false;
+      await new Promise((resolve, reject) => {
+        setTimeout(() => {
+          resolve()
+        }, 100)
+      })
+
       const element = document.querySelector('.main-con');
       const bottomCon = document.querySelector('.bottom-con');
 
@@ -194,6 +213,7 @@ export default {
       // 暂时修改 main-con 让它不要滚动，从而可以绘制全部内容
       element.style.overflowY = 'visible';
       element.style.height = 'auto';
+
 
       const canvas = await html2canvas(element, {
         windowHeight: element.scrollHeight,
@@ -216,6 +236,9 @@ export default {
         unit: 'mm',
         format: [width, height]
       });
+
+      this.showPreview = true
+
 
       // 将图片添加到 jsPDF 实例
       pdf.addImage(imgData, 'PNG', 0, 0, width, height);
@@ -345,42 +368,4 @@ export default {
   display: inline-block;
   width: calc(100% - 140px);
 }
-
-table {
-  width: 100%;
-  box-sizing: border-box;
-  border: 1px solid #000;
-  border-collapse: collapse;
-  margin-top: 24px;
-}
-
-table * {
-  padding: 0;
-  margin: 0;
-  box-sizing: border-box;
-  border-spacing: 0;
-}
-
-table tr {
-  height: 36px;
-  line-height: 36px;
-  text-align: center;
-}
-
-table tr td {
-  padding: 0 10px;
-  border-bottom: 1px solid #000;
-  border-right: 1px solid #000;
-}
-
-table tr td:last-child {
-  border-right: 0px solid #000;
-}
-
-table tbody tr:last-child td {
-  border-bottom: 0px solid #000;
-}
-
-table tr td a {
-  color: #007bff;
-}</style>
+</style>

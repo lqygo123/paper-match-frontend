@@ -79,14 +79,14 @@
             <el-button
               type="primary"
               size="mini"
-              @click="deleteReport(scope.row._id)"
-              >删除</el-button
-            >
-            <el-button
-              type="primary"
-              size="mini"
               @click="goDetail(scope.row)"
               >查看</el-button
+            >
+            <el-button
+              type="danger"
+              size="mini"
+              @click="deleteReport(scope.row._id)"
+              >删除</el-button
             >
           </template>
         </el-table-column>
