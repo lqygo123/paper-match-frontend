@@ -42,7 +42,7 @@
           <!-- 重置 -->
           <el-button @click="() => { filters = {} ; getReports() }">重置</el-button>
           <el-button type="primary" @click="getReports">查询</el-button>
-          <!-- <el-button type="primary">导出</el-button> -->
+          <el-button v-if="selectedRow.length" type="danger" @click="deleteSelected">删除选中项目</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -52,7 +52,9 @@
         :data="reports"
         border
         style="width: 100%"
+        @selection-change="handleSeletionChange"
       >
+        <el-table-column type="selection" width="55"></el-table-column>
         <el-table-column
           align="center"
           prop="projectName"
@@ -124,6 +126,7 @@ export default {
         pageSize: 10,
         total: 0,
       },
+      selectedRow: [],
       filters: {
         projectName: "",
         biddingNumber: "",
@@ -182,9 +185,6 @@ export default {
     },
 
     async deleteReport(id) {
-
-      // 增加 comfirm 交互
-
       this.$confirm('此操作将永久删除该报告, 是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -203,10 +203,38 @@ export default {
           message: '已取消删除'
         });
       });
+    },
 
-      // const res = await deleteReport(id);
-      // console.log(res);
-      // this.getReports(this.pagination.page);
+    handleSeletionChange(val) {
+      console.log('handleSeletionChange', val);
+      this.selectedRow = val;
+    },
+
+    async deleteSelected() {
+
+      // coomfirm
+      this.$confirm(`此操作将永久删除 ${this.selectedRow.length} 份报告, 是否继续?`, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async () => {
+        await this.deleteSelectedReports();
+        this.$message({
+          type: 'success',
+          message: '删除成功!'
+        });
+        this.getReports(this.pagination.page);
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        });
+      });
+    },
+
+    async deleteSelectedReports() {
+      const ids = this.selectedRow.map((item) => item._id);
+      await Promise.all(ids.map((id) => deleteReport(id)));
     },
   },
 };

@@ -137,8 +137,15 @@ export default {
       if (this.mode === 'ocr') {
         numPages = this.ocrPages.length;
       } else {
+
+        this.$loading({
+          lock: true,
+          text: '正在加载中',
+        });
+
         pdfjsLib.GlobalWorkerOptions.workerSrc = require("pdfjs-dist/build/pdf.worker.min.mjs");
         this.pdfDocument = await pdfjsLib.getDocument(url).promise;
+        this.$loading().close();
         numPages = this.pdfDocument.numPages;
       }
 
@@ -188,7 +195,13 @@ export default {
           }, 100);
         })
       } else {
+
+        this.$loading({
+          lock: true,
+          text: '正在加载中',
+        });
         pdfDocument2 = await pdfjsLib.getDocument(url).promise;
+        this.$loading().close();
         numPages = pdfDocument2.numPages;
       }
 
@@ -326,7 +339,9 @@ export default {
 
     handleShowPdf2() {
       this.showPdf2 = !this.showPdf2
-      this.loadPdf2(`${DOMAIN}/api/v1/file/${this.compireResult.targetFileId}`);
+      if (this.showPdf2) {
+        this.loadPdf2(`${DOMAIN}/api/v1/file/${this.compireResult.targetFileId}`);
+      }
     },
 
     async setCanvasSize(pageNum, canvas) {
@@ -554,6 +569,7 @@ export default {
   height: 100%;
   width: 70%;
 }
+
 .pdfContainer {
   position: relative;
   height: 100%;
@@ -574,10 +590,9 @@ export default {
 
 .pdf-page {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-  margin: 40px auto;
+  margin: 40px;
   position: relative;
   display: inline-block;
-
 }
 .highlight-block {
   font-size: 10px;
