@@ -190,13 +190,25 @@ export default {
 
       const originalDisplay = bottomCon.style.display;
       bottomCon.style.display = 'none';
-      const canvas = await html2canvas(element);
+
+      // 暂时修改 main-con 让它不要滚动，从而可以绘制全部内容
+      element.style.overflowY = 'visible';
+      element.style.height = 'auto';
+
+      const canvas = await html2canvas(element, {
+        windowHeight: element.scrollHeight,
+        windowWidth: element.scrollWidth
+      });
       const imgData = canvas.toDataURL('image/png');
       bottomCon.style.display = originalDisplay;
 
-      // 获取 .main-con 元素的宽度和高度（转换为毫米）
-      const width = element.offsetWidth * 0.264583;
-      const height = element.offsetHeight * 0.264583;
+      // 考虑 main-con 可能滚动，如有滚动，要把滚动下面的内容也画进 pdf
+      const width = element.scrollWidth * 0.264583;
+      const height = element.scrollHeight * 0.264583;
+
+      // 改回原来的样式
+      element.style.overflowY = 'auto';
+      element.style.height = 'calc(100% - 120px)';
 
       // 创建一个与 .main-con 元素大小一致的 jsPDF 实例
       const pdf = new jsPDF({

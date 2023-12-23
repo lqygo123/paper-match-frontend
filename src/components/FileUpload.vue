@@ -368,8 +368,13 @@ export default {
 
     async handleCompire() {
 
+      if (this.files.some((file) => file.state === '上传中')) {
+        this.$message.error('有文件正在上传中，请等待上传完成')
+        return
+      }
+
       if (this.files.length < 2) {
-        alert('请至少上传两个文件')
+        this.$message.error('请至少上传两个文件')
         return
       }
 

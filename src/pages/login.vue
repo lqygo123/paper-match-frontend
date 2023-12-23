@@ -80,6 +80,7 @@ export default {
   /* asset login-background.png */
   background: url('../assets/login-background.png') no-repeat center center;
   background-color: #F6F8FA;
+  background-size: cover;
 }
 #login-page .login-con {
   width: 1000px;

@@ -25,7 +25,7 @@
         <i class="el-icon-user"></i>
         <span>用户管理</span>
       </el-menu-item>
-      <el-menu-item index="logout">
+      <el-menu-item index="logout" class="bottom">
         <i class="el-icon-switch-button"></i>
         <span>退出登录</span>
       </el-menu-item>
@@ -52,13 +52,26 @@ export default {
 
   },
   methods: {
+    handleLogout() {
+      // logout();
+      // this.$router.push("/login");
+
+      // modal 二次确认
+      this.$confirm("确认退出登录吗？", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+      .then(() => {
+        logout();
+        this.$router.push("/login");
+      })
+
+    },
     handleSelect(key) {
       this.activeIndex = key;
       if (key === 'logout') {
-        logout()
-        this.$router.push(
-          "/login"
-        );
+        this.handleLogout()
         return
       }
       this.$router.push(
@@ -81,9 +94,19 @@ export default {
   border-right: 0;
 }
 ::v-deep .el-menu-item {
-  border-bottom: 1px solid #dcdfe6;
+  border-bottom: 1px solid #eeeeee;
 }
 ::v-deep .el-menu-item.is-active {
   color: #007bff;
+}
+
+.el-menu-vertical-demo.el-menu {
+  height: 100%;
+  position: relative;
+}
+.bottom {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
 }
 </style>

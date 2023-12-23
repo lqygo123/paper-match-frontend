@@ -39,6 +39,8 @@
           </el-date-picker>
         </el-form-item>
         <el-form-item>
+          <!-- 重置 -->
+          <el-button @click="() => { filters = {} ; getReports() }">重置</el-button>
           <el-button type="primary" @click="getReports">查询</el-button>
           <!-- <el-button type="primary">导出</el-button> -->
         </el-form-item>
@@ -197,6 +199,16 @@ export default {
   left: 0;
 }
 
+.el-form-item  {
+  margin-bottom: 10px;
+}
+.filter {
+  background: #FAFAFA;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  display: flex;
+}
 #main-page .el-date-editor .el-range-separator {
   box-sizing: content-box;
 }
@@ -235,4 +247,13 @@ export default {
   background-color: #007bff;
   border-color: #007bff;
 }
+</style>
+<style>
+.el-table .cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
 </style>

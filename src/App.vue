@@ -65,4 +65,12 @@ export default {
   height: 100%;
   background: #f5f5f5;
 }
+.el-date-editor .el-range-separator {
+  box-sizing: content-box;
+}
+.user-item-content-small{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 </style>
