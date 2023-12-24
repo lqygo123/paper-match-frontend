@@ -61,7 +61,7 @@
         <el-table-column
           align="center"
           prop="biddingFileName"
-          label="目标文件"
+          label="查重文件"
         >
         </el-table-column>
         <el-table-column
@@ -168,9 +168,9 @@ export default {
           ...item,
           biddingFileName: decodeURIComponent(item.biddingFileName),
           targetFileName: decodeURIComponent(item.targetFileName),
-          repetitionRate: `${parseFloat(item.abstract.repetitionRate) * 100 || 0}`.substring(0, 5) + '%',
-          sameImage: `${item.abstract.imageRepetitionCount}/${item.abstract.imageTotal}`,
-          sameSentence: `${item.abstract.textRepetitionCount}/${item.abstract.textTotal}`,
+          repetitionRate: `${parseFloat( (item.abstract.imageRepetitionCount + item.abstract.textRepetitionCount) / (item.abstract.pdf1ImageTotal + item.abstract.pdf1TextTotal)) * 100 || 0}`.substring(0, 5) + '%',
+          sameImage: `${item.abstract.imageRepetitionCount}/${item.abstract.pdf1ImageTotal}`,
+          sameSentence: `${item.abstract.textRepetitionCount}/${item.abstract.pdf1TextTotal}`,
         };
         return tmp;
       });
