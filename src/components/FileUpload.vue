@@ -208,7 +208,7 @@ export default {
 
       try {
         for (let i = 0; i < this.files.length; i++) {
-          for (let j = 0; j < this.files.length; j++) {
+          for (let j = i; j < this.files.length; j++) {
             if (i === j) {
               continue
             }

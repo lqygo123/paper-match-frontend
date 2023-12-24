@@ -61,13 +61,13 @@
         <el-table-column
           align="center"
           prop="biddingFileName"
-          label="招标公司"
+          label="目标文件"
         >
         </el-table-column>
         <el-table-column
           align="center"
           prop="targetFileName"
-          label="对比公司"
+          label="对比文件"
         >
         </el-table-column>
         <el-table-column
