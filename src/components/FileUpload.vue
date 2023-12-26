@@ -76,7 +76,7 @@
         <div class="unUploaded-container">
           <div class="select-file-text left-select">点击或拖放招标文件到这里</div>
           <div class="file-restriction">
-            格式支持：单份 50M 以内 pdf 扫描件文档进行比对
+            {{ mode === 'digital' ? '格式支持：单份 50M 以内 pdf 文档进行比对' : '格式支持：单份 100 页以内 pdf 扫描件文档进行比对'  }}
           </div>
         </div>
       </div>
@@ -112,7 +112,7 @@
         <div class="unUploaded-container">
           <div class="select-file-text left-select">点击或拖放投标文件到这里</div>
           <div class="file-restriction">
-            格式支持：单份 50M 以内 pdf 扫描件文档进行比对
+            {{ mode === 'digital' ? '格式支持：单份 50M 以内 pdf 文档进行比对' : '格式支持：单份 100 页以内 pdf 扫描件文档进行比对'  }}
           </div>
         </div>
       </div>
