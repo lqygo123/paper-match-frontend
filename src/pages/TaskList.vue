@@ -9,30 +9,20 @@
         <div class="task-list-item">上传时间</div>
         <div class="task-list-item">操作</div>
       </div>
-      <!-- <div class="no-task" v-else>
-        
-      </div> -->
-
       <el-empty class="no-task" v-else><el-link type="primary" @click="() => { $router.push('/report-list') }">点击查看最新报告</el-link> </el-empty>
-
       <div class="task-list-item" v-for="batchItem in groupedList" :key="batchItem.batchId + Math.random()">
         <div class="task-list-item-name">{{ batchItem.projectName }}</div>
         <div class="task-list-item">{{ batchItem.creator.role === 'admin' ? '管理员' : batchItem.creator.name || '-' }}</div>
-        <div class="task-list-item">{{ batchItem.total - batchItem.waitting - batchItem.running }}/{{ batchItem.total }}</div>
+        <div class="task-list-item" v-if="batchItem.isFinished">已完成</div>
+        <div class="task-list-item" v-else>{{ batchItem.total - batchItem.waitting - batchItem.running }}/{{ batchItem.total }}</div>
         <div class="task-list-item">{{ batchItem.createAt }}</div>
         <div class="task-list-item">
-          <el-button type="primary" size="mini" @click="cancelTask(batchItem.batchId)">取消</el-button>
+          <!-- this.$router.push({ path: "/report-detail", query: { id: row._id } }); -->
+          <el-button type="primary" size="mini" v-if="batchItem.isFinished" @click="() => { $router.push({ path: '/report-detail', query: { id: batchItem.reportId } }) }"
+          >查看</el-button>
+          <el-button type="primary" size="mini" v-else @click="cancelTask(batchItem.batchId)">取消</el-button>
         </div>
       </div>
-
-      <!-- <div class="task-list-item" v-for="task in runningTaskList" :key="task.id">
-        <div class="task-list-item-state green">对比中</div>
-        <div class="task-list-item-file">{{ task.reportMetaInfo.projectName }}</div>
-      </div>
-      <div class="task-list-item" v-for="task in waitingTaskList" :key="task.id">
-        <div class="task-list-item-state">等待中</div>
-        <div class="task-list-item-file">{{ task.reportMetaInfo.projectName }}</div>
-      </div> -->
     </div>
   </div>
 </template>
@@ -94,83 +84,6 @@ export default {
     this.updateListIntervalId = setInterval(() => {
       this.getTaskList();
     }, 1000);
-
-    // this.groupedList = [
-    //   {
-    //     projectName: '项目1',
-    //     biddingNumber: '123',
-    //     biddingCompany: '123',
-    //     participatingCompany: '123',
-    //     time: '123',
-    //     createAt: formateTime(1702740559836),
-    //     total: 12,
-    //     waitting: 10,
-    //     running: 1,
-    //     creator: {
-    //       role: 'admin',
-    //     },
-    //     batchId: 'batch-1702740559836fwadrdna2wi',
-    //   },
-    //   {
-    //     projectName: '项目2',
-    //     biddingNumber: '123',
-    //     biddingCompany: '123',
-    //     participatingCompany: '123',
-    //     time: '123',
-    //     createAt: formateTime(1702740559836),
-    //     total: 12,
-    //     waitting: 10,
-    //     running: 1,
-    //     creator: {
-    //       role: 'admin',
-    //     },
-    //     batchId: 'batch-1702740559836fwadrdna2wi',
-    //   },
-    //   {
-    //     projectName: '项目3',
-    //     biddingNumber: '123',
-    //     biddingCompany: '123',
-    //     participatingCompany: '123',
-    //     time: '123',
-    //     createAt: formateTime(1702740559836),
-    //     total: 12,
-    //     waitting: 10,
-    //     running: 1,
-    //     creator: {
-    //       role: 'admin',
-    //     },
-    //     batchId: 'batch-1702740559836fwadrdna2wi',
-    //   },
-    //   {
-    //     projectName: '项目4',
-    //     biddingNumber: '123',
-    //     biddingCompany: '123',
-    //     participatingCompany: '123',
-    //     time: '123',
-    //     createAt: formateTime(1702740559836),
-    //     total: 12,
-    //     waitting: 10,
-    //     running: 1,
-    //     creator: {
-    //       role: 'admin',
-    //     },
-    //     batchId: 'batch-1702740559836fwadrdna2wi',
-    //   },
-    //   {
-    //     projectName: '项目5',
-    //     biddingNumber: '123',
-    //     biddingCompany: '123',
-    //     participatingCompany: '123',
-    //     time: '123',
-    //     createAt: formateTime(1702740559836),
-    //     total: 12,
-    //     waitting: 10,
-    //     running: 1,
-    //     creator: {
-    //       role: 'admin',
-    //     },
-    //     batchId: 'batch-1702740559836fwadrdna2wi',
-    //   }]
   },
   destroyed() {
     clearInterval(this.updateListIntervalId);
@@ -180,6 +93,7 @@ export default {
       const res = await getCurrentTasks();
       this.runningTaskList = res.data.running;
       this.waitingTaskList = res.data.queue;
+      const completedTasks = res.data.completedTasks;
 
       const groupedTask = {}
       this.runningTaskList.forEach((task) => {
@@ -209,6 +123,20 @@ export default {
           };
         }
         groupedTask[batchId].waitting += 1;
+      });
+
+      completedTasks.forEach((task) => {
+        const batchId = task.batchId;
+        if (!groupedTask[batchId]) {
+          groupedTask[batchId] = {
+            ...task.reportMetaInfo,
+            createAt: formateTime(task.createAt),
+            reportId: task.reportId,
+            total: task.batchTotal,
+            isFinished: true,
+            creator: task.creator,
+          };
+        }
       });
 
       this.groupedList = Object.keys(groupedTask).map((key) => {
