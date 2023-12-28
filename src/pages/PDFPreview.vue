@@ -133,7 +133,7 @@ export default {
     this.mode = compireResult.data.mode
 
     if (this.mode === 'ocr') {
-      this.factor = 0.4
+      this.factor = 1
     } else {
       this.factor = 1
     }
