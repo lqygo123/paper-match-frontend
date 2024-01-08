@@ -41,7 +41,7 @@
         <div class="header">
           <div class="title">重复率</div>
           <div class="content">
-            {{ compireResult.abstract.textRepetitionCount + compireResult.abstract.imageRepetitionCount }} / {{ compireResult.abstract.pdf1TextTotal + compireResult.abstract.pdf1ImageTotal }}
+            {{ compireResult.abstract.count }} / {{ compireResult.abstract.total }}
           </div>
         </div>
         <div
