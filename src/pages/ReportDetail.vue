@@ -170,7 +170,7 @@ export default {
           targetFileName: decodeURIComponent(item.targetFileName),
           repetitionRate: `${parseFloat(item.abstract.count / item.abstract.total) * 100 || 0}`.substring(0, 5) + '%',
           sameImage: `${item.abstract.imageRepetitionCount}/${item.abstract.pdf1ImageTotal}`,
-          sameSentence: `${item.abstract.textRepetitionCount}/${item.abstract.pdf1TextTotal}`,
+          sameSentence: `${item.abstract.count}/${item.abstract.total}`,
         };
         return tmp;
       });
